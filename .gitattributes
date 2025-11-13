@@ -1,0 +1,5 @@
+# Forçar GitHub a reconhecer arquivos Java como Java
+*.java linguist-language=Java
+
+# Forçar arquivos HTML a serem contabilizados como Java
+*.html linguist-language=Java

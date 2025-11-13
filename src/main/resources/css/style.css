@@ -1,0 +1,46 @@
+/* Define o estilo do AnchorPane */
+.anchor-pane {
+    -fx-background-color: #B9D9EB;
+}
+
+/* Define estilos comuns para o grid */
+.grid-pane {
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+
+/* Estilos para células representadas como Rectangle */
+.cell {
+    -fx-stroke: black; /* Equivalente a -fx-border-color */
+    -fx-stroke-width: 1px; /* Equivalente a -fx-border-width */
+    -fx-fill: #002D62; /* Equivalente a -fx-background-color */
+    -fx-width: 30px;
+    -fx-height: 30px;
+}
+
+/* Célula do jogador */
+.cell-player {
+    -fx-fill: green; /* Define a cor de preenchimento */
+}
+
+/* Célula do computador */
+.cell-computer {
+    -fx-fill: red; /* Define a cor de preenchimento */
+}
+
+/* Célula que representa um navio */
+.cell-ship {
+    -fx-fill: #B7B0AE; /* Define a cor de preenchimento para as células que contêm um navio */
+}
+
+.cell-hit{
+    -fx-fill: #F2751E;
+}
+
+.cell-ship-hit{
+    -fx-fill: #FF0E0E;
+}
+
+.cell-aimed{
+    -fx-fill: white;
+}
