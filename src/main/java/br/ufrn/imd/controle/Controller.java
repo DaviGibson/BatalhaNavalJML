@@ -13,6 +13,8 @@ import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
+
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 /**
@@ -149,6 +151,32 @@ public class Controller {
         }
     }
 
+	
+    private void posicionarNavio(String nome, Ship navio, int tamanho, CellButton celIni, Board board1) {
+		List<CellButton> posicoes = new ArrayList<>();
+		posicoes.add(celIni);
+		boolean sucesso = adicionarPosicoesNavio(celIni, posicoes, tamanho);
+		
+		try {
+			if (sucesso) {
+				navio.setPosition(posicoes);
+				jogador.placeShip(navio, celIni);
+				updateBoard(board1);
+			}
+		} catch (CelulaInvalidaException e) {
+			desfazerNavio1(navio);
+			updateBoard(board1);
+			updateLabel(e.getMessage());
+			System.out.println(e.getMessage());
+		}
+	}
+
+    private void processarSelecaoAlvos(String nome, List<CellButton> lista, int fileira, int coluna) throws ArrayIndexOutOfBoundsException, CelulaInvalidaException {
+		selecionarAlvos(nome, lista, fileira, coluna);
+		radar.add(computadorTabuleiro.getCell(fileira, coluna));
+		estado = "selecionarAlvos";
+	}
+    
     /**
      * Handles cell click events during various game states.
      *
@@ -157,145 +185,65 @@ public class Controller {
      * @throws CelulaInvalidaException If an invalid cell is clicked.
      */
     private void handleCellClick(MouseEvent event, String gridType) throws CelulaInvalidaException {
+
         Node clickedNode = event.getPickResult().getIntersectedNode();
-        if (clickedNode != null) {
-            int coluna = GridPane.getColumnIndex(clickedNode);
-            int fileira = GridPane.getRowIndex(clickedNode);
+        if (clickedNode == null) return;
 
-            boolean sucessoPosicao;
-            CellButton celIni;
-            Board board1;
-            if (gridType.equals("jogador")){
-                celIni = jogadorTabuleiro.getCell(fileira, coluna);
-                board1 = jogadorTabuleiro;
-            } else {
-                celIni = computadorTabuleiro.getCell(fileira, coluna);
-                board1 = computadorTabuleiro;
-            }
+        int coluna = GridPane.getColumnIndex(clickedNode);
+        int fileira = GridPane.getRowIndex(clickedNode);
 
-            List<CellButton> posicoesNavio = new ArrayList<>();
+        Board board1 = gridType.equals("jogador") ? jogadorTabuleiro : computadorTabuleiro;
+        CellButton celIni = board1.getCell(fileira, coluna);
+        
+        if(gridType.equals("jogador")) {
+        	switch (estado) {
+	            case "clique":
+	                updateLabel("Célula clicada em: [" + fileira + ", " + coluna + "] no grid: " + gridType);
+	                return;
+	
+	            case "posicionarCorveta":
+	                posicionarNavio("Corveta", new Corvette(), 2, celIni, board1);
+	                estado = "clique";
+	                return;
+	
+	            case "posicionarSubmarino":
+	                posicionarNavio("Submarino", new Submarine(), 3, celIni, board1);
+	                estado = "clique";
+	                return;
+	
+	            case "posicionarFragata":
+	                posicionarNavio("Fragata", new Frigate(), 4, celIni, board1);
+	                estado = "clique";
+	                return;
+	
+	            case "posicionarDestroyer":
+	                posicionarNavio("Destroyer", new Destroyer(), 5, celIni, board1);
+	                estado = "clique";
+	                return;
+        	}
+        } else { // tabuleiro pc
+        	switch (estado) {
+	            case "clique":
+	                updateLabel("Célula clicada em: [" + fileira + ", " + coluna + "] no grid: " + gridType);
+	                return;
+	            case "selecionarAlvosCorveta":
+	                processarSelecaoAlvos("Corveta", alvosMiradosCorveta, fileira, coluna);
+	                return;
 
-            switch (estado) {
-                case "clique":
-                    System.out.println("Célula clicada em: [" + fileira + ", " + coluna + "] no grid: " + gridType);
-                    updateLabel("Célula clicada em: [" + fileira + ", " + coluna + "] no grid: " + gridType);
-                    break;
-                case "posicionarCorveta":
-                    if (gridType.equals("jogador")){
-                        updateLabel("Posicione sua Corveta");
-                        posicoesNavio.add(celIni);
-                        sucessoPosicao = adicionarPosicoesNavio(celIni, posicoesNavio, 2);
-                        Ship corveta = new Corvette();
-                        try {
-                            if (sucessoPosicao){
-                                corveta.setPosition(posicoesNavio);
-                                jogador.placeShip(corveta, celIni);
-                                updateBoard(board1);
-                            }
-                        } catch (CelulaInvalidaException e){
-                            desfazerNavio1(corveta);
-                            updateBoard(board1);
-                            updateLabel(e.getMessage());
-                            System.out.println(e.getMessage());
-                        }
-                    }
-                    estado = "clique";
-                    break;
-                case "posicionarSubmarino":
-                    if (gridType.equals("jogador")){
-                        updateLabel("Posicione seu Submarino");
-                        posicoesNavio.add(celIni);
-                        sucessoPosicao = adicionarPosicoesNavio(celIni, posicoesNavio, 3);
-                        Ship submarino = new Submarine();
-                        try {
-                            if (sucessoPosicao){
-                                submarino.setPosition(posicoesNavio);
-                                jogador.placeShip(submarino, celIni);
-                                updateBoard(board1);
-                            }
-                        } catch (CelulaInvalidaException e){
-                            desfazerNavio1(submarino);
-                            updateBoard(board1);
-                            updateLabel(e.getMessage());
-                            System.out.println(e.getMessage());
-                        }
-                    }
-                    estado = "clique";
-                    break;
-                case "posicionarFragata":
-                    if (gridType.equals("jogador")){
-                        updateLabel("Posicione sua Fragata");
-                        posicoesNavio.add(celIni);
-                        sucessoPosicao = adicionarPosicoesNavio(celIni, posicoesNavio, 4);
-                        Ship fragata = new Frigate();
-                        try {
-                            if (sucessoPosicao){
-                                fragata.setPosition(posicoesNavio);
-                                jogador.placeShip(fragata, celIni);
-                                updateBoard(board1);
-                            }
-                        } catch (CelulaInvalidaException e){
-                            desfazerNavio1(fragata);
-                            updateBoard(board1);
-                            updateLabel(e.getMessage());
-                            System.out.println(e.getMessage());
-                        }
-                    }
-                    estado = "clique";
-                    break;
-                case "posicionarDestroyer":
-                    if (gridType.equals("jogador")){
-                        updateLabel("Posicione seu Destroyer");
-                        posicoesNavio.add(celIni);
-                        sucessoPosicao = adicionarPosicoesNavio(celIni, posicoesNavio, 5);
-                        Ship destroyer = new Destroyer();
-                        try {
-                            if (sucessoPosicao){
-                                destroyer.setPosition(posicoesNavio);
-                                jogador.placeShip(destroyer, celIni);
-                                updateBoard(board1);
-                            }
-                        } catch (CelulaInvalidaException e){
-                            desfazerNavio1(destroyer);
-                            updateBoard(board1);
-                            updateLabel(e.getMessage());
-                            System.out.println(e.getMessage());
-                        }
-                    }
-                    estado = "clique";
-                    break;
-                case "selecionarAlvosCorveta":
-                    if (gridType.equals("computador")){
-                        selecionarAlvos("Corveta", alvosMiradosCorveta, fileira, coluna);
-                        radar.add(computadorTabuleiro.getCell(fileira,coluna));
-                        estado = "selecionarAlvos";
-                    }
-                    break;
-                case "selecionarAlvosSubmarino":
-                    if (gridType.equals("computador")){
-                        selecionarAlvos("Submarino", alvosMiradosSubmarino, fileira, coluna);
-                        radar.add(computadorTabuleiro.getCell(fileira,coluna));
-                        estado = "selecionarAlvos";
-                    }
-                    break;
-                case "selecionarAlvosFragata":
-                    if (gridType.equals("computador")){
-                        selecionarAlvos("Fragata", alvosMiradosFragata, fileira, coluna);
-                        radar.add(computadorTabuleiro.getCell(fileira,coluna));
-                        estado = "selecionarAlvos";
-                    }
-                    break;
-                case "selecionarAlvosDestroyer":
-                    if (gridType.equals("computador")){
-                        selecionarAlvos("Destroyer", alvosMiradosDestroyer, fileira, coluna);
-                        radar.add(computadorTabuleiro.getCell(fileira,coluna));
-                        estado = "selecionarAlvos";
-                    }
-                    break;
-            }
+	            case "selecionarAlvosSubmarino":
+	                processarSelecaoAlvos("Submarino", alvosMiradosSubmarino, fileira, coluna);
+	                return;
+
+	            case "selecionarAlvosFragata":
+	                processarSelecaoAlvos("Fragata", alvosMiradosFragata, fileira, coluna);
+	                return;
+
+	            case "selecionarAlvosDestroyer":
+	                processarSelecaoAlvos("Destroyer", alvosMiradosDestroyer, fileira, coluna);
+	                return;
+	    	}
         }
     }
-    
     
     public void handleButtonCorvette() {
         handleButtonShip("corvette");
@@ -364,9 +312,7 @@ public class Controller {
             isAlive = false;
         }
 
-        // =========================
-        //   MODO DE POSICIONAR
-        // =========================
+        // POSICIONAR
         if (estado.equals("clique")) {
             boolean posicionado = false;
 
@@ -385,9 +331,7 @@ public class Controller {
             return;
         }
 
-        // =========================
-        //   MODO DE MIRAR/ATIRAR
-        // =========================
+        // MIRAR/ATIRAR
         if (estado.equals("selecionarAlvos")) {
             if (isAlive) {
                 if (listaAlvos.isEmpty()) {
