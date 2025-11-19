@@ -164,7 +164,7 @@ public class Controller {
 				updateBoard(board1);
 			}
 		} catch (CelulaInvalidaException e) {
-			desfazerNavio1(navio);
+			desfazerNavio(navio.getPosition());
 			updateBoard(board1);
 			updateLabel(e.getMessage());
 			System.out.println(e.getMessage());
@@ -365,7 +365,7 @@ public class Controller {
 
             if (naviosVivos == naviosMirados){ // Verifica se todos navios vivos miraram
 
-                atiraMirados(computadorTabuleiro);
+                atiraCelulasMiradas(computadorTabuleiro);
                 updateBoard(computadorTabuleiro);
 
                 verificaRadar();
@@ -399,7 +399,7 @@ public class Controller {
                 System.out.println("PLAYER PERDEU");
                 estado = "endGame";
             }
-        }
+        } // só faz algo se o estado é seleciona alvos
     }
 
     /**
@@ -722,24 +722,13 @@ public class Controller {
             cell.reset();
         }
     }
-
-    /**
-     * Reseta as células de um navio.
-     *
-     * @param navio o navio cujas células serão resetadas
-     */
-    private void desfazerNavio1(Ship navio) {
-        for (CellButton cell : navio.getPosition()) {
-            cell.reset();
-        }
-    }
-
+    
     /**
      * Percorre todas as células do tabuleiro e executa um tiro nas células miradas.
      *
      * @param b o tabuleiro em que os tiros serão executados
      */
-    private void atiraMirados(Board b){
+    private void atiraCelulasMiradas(Board b){
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
                 CellButton cell = b.getCell(row, col);
