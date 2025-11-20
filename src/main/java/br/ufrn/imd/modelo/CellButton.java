@@ -50,6 +50,15 @@ public class CellButton {
         state = State.WATER;
         isHit = false;
     }
+    
+    /**
+     * Resets the state of the cell button to water and clears hit status.
+     */
+    public void undoShipPositioning() {
+        if (this.getState() != CellButton.State.SHIP) {
+        	state = State.WATER;
+        }
+    }
 
     /**
      * Sets the state of the cell button.

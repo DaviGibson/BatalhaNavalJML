@@ -116,7 +116,7 @@ public abstract class Ship implements IShip {
         int successes = 0;
         for (CellButton cell : position) {
             if (cell.getState() == CellButton.State.SHIP) {
-                throw new CelulaInvalidaException("You tried to place a ship on a cell already occupied by another ship.");
+                throw new CelulaInvalidaException("Seu navio sobrepôs outro, posicione-o de novo.");
             } else {
                 successes++;
             }

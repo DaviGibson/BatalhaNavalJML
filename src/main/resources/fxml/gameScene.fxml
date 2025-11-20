@@ -24,6 +24,6 @@
       </font>
    </Label>
    <Button fx:id="startGameButton" layoutX="350.0" layoutY="632.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="150.0" text="Começar Jogo!!" />
-   <Button fx:id="atirarButton" layoutX="373.0" layoutY="474.0" mnemonicParsing="false" onAction="#handleAtirar" prefHeight="29.0" prefWidth="105.0" text="Atirar" />
+   <Button fx:id="atirarButton" layoutX="373.0" layoutY="474.0" mnemonicParsing="false" onAction="#handleButtonAtirar" prefHeight="29.0" prefWidth="105.0" text="Atirar" />
    <Label fx:id="labelRadar" layoutX="175.0" layoutY="582.0" prefHeight="41.0" prefWidth="533.0" />
 </AnchorPane>
