@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/*@ 
-  @ // --- Invariantes globais do tabuleiro ---
-  @ public invariant cells != null && cells.length == 10 
-  @          && cells[0].length == 10;
-  @ public invariant ships != null;
-  @ public invariant numShips == ships.size();
-  @ public invariant 
-  @   (\forall int r, c; 0 <= r && r < 10 && 0 <= c && c < 10;
-  @       cells[r][c] != null);
-  @*/
 
 public class Board {
+  	
+	/*@ 
+    @ // --- Invariantes globais do tabuleiro ---
+    @ public invariant cells != null && cells.length == 10 
+    @          && cells[0].length == 10;
+    @ public invariant ships != null;
+    @ public invariant numShips == ships.size();
+    @ public invariant 
+    @   (\forall int r, c; 0 <= r && r < 10 && 0 <= c && c < 10;
+    @       cells[r][c] != null);
+    @*/
 
     private CellButton[][] cells;
     private List<Ship> ships;

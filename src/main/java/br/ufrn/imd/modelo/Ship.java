@@ -4,20 +4,34 @@ import br.ufrn.imd.controle.CelulaInvalidaException;
 import java.util.ArrayList;
 import java.util.List;
 
-/*@ 
-  @ public invariant position != null;
-  @ public invariant size >= 2 && size <= 5;
-  @*/
 public abstract class Ship implements IShip {
 
-    protected int size;
-    protected List<CellButton> position;
-    protected boolean isSunk;
+    /*@ spec_public @*/ protected int size;
+    /*@ spec_public @*/ protected List<CellButton> position;
+    /*@ spec_public @*/ protected boolean isSunk;
+
+    /*@ 
+      @ public invariant size > 0;
+      @ public invariant position != null;
+      @ public invariant position.size() == size;
+      @ public invariant 
+      @   (\forall int i; 0 <= i && i < position.size();
+      @       position.get(i) != null);
+
+      @ public invariant 
+      @   (\forall CellButton c; position.contains(c);
+      @        c.getState() == CellButton.State.SHIP
+      @     || c.getState() == CellButton.State.HIT);
+
+      @ public invariant isSunk ==>
+      @   (\forall CellButton c; position.contains(c);
+      @        c.isHit());
+      @*/
 
     /*@ public normal_behavior
-      @   ensures position != null && position.isEmpty();
       @   ensures !isSunk;
-      @ assignable position, isSunk;
+      @   ensures position.size() == 0;
+      @   assignable position, isSunk;
       @*/
     public Ship() {
         this.position = new ArrayList<>();
@@ -25,8 +39,12 @@ public abstract class Ship implements IShip {
     }
 
     /*@ public normal_behavior
-      @   ensures (\forall CellButton c; position.contains(c); c.getState() == CellButton.State.SHIP);
-      @ assignable (\exists int i; 0 <= i && i < position.size(); position.get(i).state); // explanatory; may need adaptation
+      @   requires position.size() == size;
+      @   ensures (\forall CellButton c; position.contains(c);
+      @               c.getState() == CellButton.State.SHIP);
+      @   assignable 
+      @       (\forall int i; 0 <= i && i < position.size();
+      @            position.get(i).state);
       @*/
     public void place() {
         for (CellButton cell : position) {
@@ -35,17 +53,17 @@ public abstract class Ship implements IShip {
     }
 
     /*@ public normal_behavior
-      @   ensures \result == (\exists CellButton c; position.contains(c); !c.isHit()) ;
-      @ pure
+      @   ensures \result == !isSunk;
+      @   ensures isSunk ==> (\forall CellButton c; position.contains(c);
+      @                           c.isHit());
+      @   assignable isSunk;
       @*/
     public boolean isAlive() {
-        int cellsHit = 0;
-        for (CellButton cell : position) {
-            if (cell.isHit()) {
-                cellsHit += 1;
-            }
+        int hit = 0;
+        for (CellButton c : position) {
+            if (c.isHit()) hit++;
         }
-        if (cellsHit == position.size()) {
+        if (hit == position.size()) {
             isSunk = true;
             return false;
         }
@@ -53,68 +71,69 @@ public abstract class Ship implements IShip {
     }
 
     /*@ public normal_behavior
-      @   ensures (\forall CellButton c; position.contains(c) ==>
-      @               (\result == (c.getRow() == row && c.getCol() == col) ? c : \old(\result)));
-      @ pure
+      @   requires row >= 0 && col >= 0;
+      @   ensures (\exists CellButton c; position.contains(c);
+      @               c.getRow() == row && c.getCol() == col)
+      @            ==> \result != null;
+      @   ensures (\forall CellButton c; position.contains(c);
+      @               !(c.getRow() == row && c.getCol() == col))
+      @            ==> \result == null;
       @*/
+
+    /*@ pure @*/
     public CellButton buscaCell(int row, int col) {
-        for (CellButton cell : position) {
-            if (cell.getRow() == row && cell.getCol() == col) {
-                return cell;
-            }
+        for (CellButton c : position) {
+            if (c.getRow() == row && c.getCol() == col) return c;
         }
         return null;
     }
 
-    /*@ public normal_behavior
-      @   ensures \result == isSunk;
-      @ pure
-      @*/
-    public boolean isSunk() { return isSunk; }
+    /*@ pure @*/ public boolean isSunk() { return isSunk; }
+    /*@ pure @*/ public int getSize() { return size; }
+    /*@ pure @*/ public List<CellButton> getPosition() { return position; }
 
-    /*@ public normal_behavior
-      @   ensures \result == size;
-      @ pure
-      @*/
-    public int getSize() { return size; }
-
-    /*@ public normal_behavior
-      @   ensures \result == position;
-      @ pure
-      @*/
-    public List<CellButton> getPosition() { return position; }
-
-    /*@ public normal_behavior
+    /*@ public exceptional_behavior
       @   requires position != null;
-      @   requires (\forall CellButton c; position.contains(c) ==> c != null);
-      @   requires position.size() == this.size;
-      @   also
-      @   exceptional_behavior
-      @     requires (\exists CellButton c; position.contains(c); c.getState() == CellButton.State.SHIP);
-      @     signals_only CelulaInvalidaException;
-      @ assignable this.position, (\forall CellButton c; position.contains(c); c.getState());
-      @   ensures this.position == position && (\forall CellButton c; position.contains(c); c.getState() == CellButton.State.SHIP);
+      @   requires position.size() == size;
+      @   requires (\forall int i; 0 <= i && i < position.size();
+      @                position.get(i) != null);
+
+      @   requires (\forall CellButton c; position.contains(c);
+      @                 c.getState() != CellButton.State.SHIP);
+
+      @   signals (CelulaInvalidaException e)
+      @       (\exists CellButton c; position.contains(c);
+      @           c.getState() == CellButton.State.SHIP);
+      @*/
+
+    /*@ public normal_behavior
+      @   requires (\forall CellButton c; position.contains(c);
+      @                 c.getState() != CellButton.State.SHIP);
+      @   ensures this.position == position;
+      @   ensures (\forall CellButton c; position.contains(c);
+      @               c.getState() == CellButton.State.SHIP);
+      @   assignable this.position,
+      @              (\forall int i; 0 <= i && i < position.size();
+      @                   position.get(i).state);
       @*/
     public void setPosition(List<CellButton> position) throws CelulaInvalidaException {
-        int successes = 0;
         for (CellButton cell : position) {
             if (cell.getState() == CellButton.State.SHIP) {
-                throw new CelulaInvalidaException("Seu navio sobrepôs outro, posicione-o de novo.");
-            } else {
-                successes++;
+                throw new CelulaInvalidaException("Seu navio sobrepôs outro.");
             }
         }
-        if (successes == size) {
-            this.position = position;
-            for (CellButton c : position) {
-                c.setState(CellButton.State.SHIP);
-            }
+        this.position = position;
+        for (CellButton c : position) {
+            c.setState(CellButton.State.SHIP);
         }
     }
 
     /*@ public normal_behavior
-      @   requires 0 <= row && 0 <= col;
-      @   ensures \not_specified; // attack is concrete per-subclass: documented in subclass
+      @   requires row >= 0 && col >= 0;
+      @   assignable \nothing;
+      @   ensures \result != null;
       @*/
+
+    /*@ pure @*/
     abstract public List<CellButton> attack(int row, int col);
 }
