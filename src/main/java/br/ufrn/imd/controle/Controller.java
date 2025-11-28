@@ -51,12 +51,6 @@ public class Controller {
     private GameState estado;
     private boolean deitado;
     private List<CellButton> radar;
-
-    // Variables for targeting player's ships
-    private List<CellButton> alvosMiradosCorveta;
-    private List<CellButton> alvosMiradosSubmarino;
-    private List<CellButton> alvosMiradosFragata;
-    private List<CellButton> alvosMiradosDestroyer;
     
  // maps de apoio para unificar lógica por tipo de navio
     private Map<ShipType, Supplier<Ship>> shipFactory;
@@ -71,10 +65,6 @@ public class Controller {
         estado = GameState.CLIQUE;
         deitado = true;
         radar = new ArrayList<>();
-        alvosMiradosCorveta = new ArrayList<>();
-        alvosMiradosSubmarino = new ArrayList<>();
-        alvosMiradosFragata = new ArrayList<>();
-        alvosMiradosDestroyer = new ArrayList<>();
         jogador = game.getPlayer1();
         computador = game.getPlayer2();
         jogadorTabuleiro = jogador.getBoard();
@@ -234,23 +224,22 @@ public class Controller {
 	            return;
 	
 	        case SELECIONAR_ALVOS_CORVETA:
-	            processarSelecaoAlvos(ShipType.CORVETA, alvosMiradosCorveta, fileira, coluna);
+	        	processarSelecaoAlvos(ShipType.CORVETA, alvosPorNavio.get(ShipType.CORVETA), fileira, coluna);
 	            return;
 	
 	        case SELECIONAR_ALVOS_SUBMARINO:
-	            processarSelecaoAlvos(ShipType.SUBMARINO, alvosMiradosSubmarino, fileira, coluna);
+	            processarSelecaoAlvos(ShipType.SUBMARINO, alvosPorNavio.get(ShipType.SUBMARINO), fileira, coluna);
 	            return;
 	
 	        case SELECIONAR_ALVOS_FRAGATA:
-	            processarSelecaoAlvos(ShipType.FRAGATA, alvosMiradosFragata, fileira, coluna);
+	            processarSelecaoAlvos(ShipType.FRAGATA, alvosPorNavio.get(ShipType.FRAGATA), fileira, coluna);
 	            return;
 	
 	        case SELECIONAR_ALVOS_DESTROYER:
-	            processarSelecaoAlvos(ShipType.DESTROYER, alvosMiradosDestroyer, fileira, coluna);
+	            processarSelecaoAlvos(ShipType.DESTROYER, alvosPorNavio.get(ShipType.DESTROYER), fileira, coluna);
 	            return;
 	
 	        case SELECIONAR_ALVOS:
-	            // comportamento genérico (se quiser manter)
 	            return;
 	
 	        case ENDGAME:
@@ -323,10 +312,9 @@ public class Controller {
             int naviosVivos = jogadorTabuleiroNavios.size();
             int naviosMirados = 0;
 
-            if (!alvosMiradosCorveta.isEmpty()){naviosMirados++;}
-            if (!alvosMiradosSubmarino.isEmpty()){naviosMirados++;}
-            if (!alvosMiradosFragata.isEmpty()){naviosMirados++;}
-            if (!alvosMiradosDestroyer.isEmpty()){naviosMirados++;}
+            for (ShipType t : ShipType.values()) {
+                if (!alvosPorNavio.get(t).isEmpty()) naviosMirados++;
+            }
 
             if (naviosVivos == naviosMirados){ // Verifica se todos navios vivos miraram
 
@@ -337,10 +325,9 @@ public class Controller {
 
                 updateLabel("Você atirou no campo inimigo");
 
-                alvosMiradosCorveta.clear();
-                alvosMiradosSubmarino.clear();
-                alvosMiradosFragata.clear();
-                alvosMiradosDestroyer.clear();
+                for (ShipType t : ShipType.values()) {
+                    alvosPorNavio.get(t).clear();
+                }
 
                 // lógica para o COMPUTADOR ATIRAR
                 computadorTabuleiro.attListaNavios();
@@ -385,7 +372,7 @@ public class Controller {
             for (CellButton c : cellsAttk) {
                 if (c.getRow() < 10 && c.getCol() < 10 && c.getRow() >= 0 && c.getCol() >= 0) {
                     jogadorTabuleiro.hitCells(c.getRow(), c.getCol());
-                    jogadorTabuleiro.buscarCellNavio(c.getRow(), c.getCol());
+                    //jogadorTabuleiro.buscarCellNavio(c.getRow(), c.getCol());
                 }
             }
             jogadorTabuleiro.attListaNavios();
@@ -658,7 +645,7 @@ public class Controller {
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
                 CellButton cell = b.getCell(row, col);
-                Node cellNode = cell.getNode();
+                Node cellNode = (Node) cell.getNode();
 
                 if (cellNode != null) {
                     cellNode.getStyleClass().removeAll("cell-ship", "cell-hit", "cell-aimed", "cell-ship-hit");

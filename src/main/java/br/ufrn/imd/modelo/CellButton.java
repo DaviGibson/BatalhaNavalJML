@@ -1,143 +1,110 @@
 package br.ufrn.imd.modelo;
 
-import javafx.scene.Node;
-
-/**
- * Represents a single cell in the game board.
- */
+// campos devem ser visíveis ao JML
 public class CellButton {
-    private int row;
-    private int col;
-    private State state;
-    private boolean isHit;
-    private boolean isAimed;
-    private Node node;
 
-    /**
-     * Enumeration representing possible states of a cell button.
-     */
-    public enum State {
-        WATER, SHIP, HIT
-    }
+    //@ public invariant 0 <= row && row < 10;
+    //@ public invariant 0 <= col && col < 10;
+    //@ public invariant state != null;
+    //@ public invariant (!isHit) ==> (state == State.WATER || state == State.SHIP);
 
-    /**
-     * Constructs a CellButton with specified row and column coordinates.
-     *
-     * @param row The row coordinate of the cell button.
-     * @param col The column coordinate of the cell button.
-     */
-    public CellButton(int row, int col) {
-        this.row = row;
-        this.col = col;
+    /*@ spec_public @*/ private int row;
+    /*@ spec_public @*/ private int col;
+    /*@ spec_public @*/ private State state;
+    /*@ spec_public @*/ private boolean isHit;
+    /*@ spec_public @*/ private boolean isAimed;
+    /*@ spec_public nullable @*/ private Object node;
+
+    public enum State { WATER, SHIP, HIT }
+
+    /*@ public normal_behavior
+      @   requires 0 <= r && r < 10;
+      @   requires 0 <= c && c < 10;
+      @   ensures row == r && col == c;
+      @   ensures state == State.WATER && !isHit && !isAimed;
+      @*/
+    public CellButton(int r, int c) {
+        this.row = r;
+        this.col = c;
         this.state = State.WATER;
         this.isHit = false;
         this.isAimed = false;
     }
 
-    /**
-     * Marks the cell button as hit.
-     */
+
+
+    /*@ public normal_behavior
+      @ ensures isHit == true;
+      @ assignable isHit;
+      @*/
     public void hit() {
-        if (!isHit) {
-            isHit = true;
-        }
+        if (!isHit) isHit = true;
     }
 
-    /**
-     * Resets the state of the cell button to water and clears hit status.
-     */
+    /*@ public normal_behavior
+      @ ensures state == State.WATER && !isHit;
+      @ assignable state, isHit;
+      @*/
     public void reset() {
         state = State.WATER;
         isHit = false;
     }
-    
-    /**
-     * Resets the state of the cell button to water and clears hit status.
-     */
+
+    /*@ public normal_behavior
+      @ ensures (\old(state) != State.SHIP) ==> state == State.WATER;
+      @ ensures (\old(state) == State.SHIP) ==> state == State.SHIP;
+      @ assignable state;
+      @*/
     public void undoShipPositioning() {
-        if (this.getState() != CellButton.State.SHIP) {
-        	state = State.WATER;
+        if (state != State.SHIP) {
+            state = State.WATER;
         }
     }
 
-    /**
-     * Sets the state of the cell button.
-     *
-     * @param state The state to set.
-     */
-    public void setState(State state) {
-        this.state = state;
+
+    /*@ public normal_behavior
+      @   requires isHit || s == State.WATER || s == State.SHIP;
+      @   ensures state == s;
+      @   assignable state;
+      @*/
+    public void setState(State s) { this.state = s; }
+
+
+    /*@ pure @*/
+    public State getState() { return state; }
+
+    /*@ pure @*/
+    public boolean isHit() { return isHit; }
+
+    /*@ public normal_behavior
+      @ ensures this.isAimed == a;
+      @ assignable isAimed;
+      @*/
+    public void setAimed(boolean a) { isAimed = a; }
+
+    /*@ pure @*/
+    public boolean getAimed() { return isAimed; }
+
+    /*@ pure @*/
+    public int getRow() { return row; }
+
+    /*@ pure @*/
+    public int getCol() { return col; }
+
+    /*@ public normal_behavior
+      @   ensures \result == node;
+      @*/
+
+    /*@ pure nullable @*/
+    public Object getNode() { 
+        return node; 
     }
 
-    /**
-     * Returns the current state of the cell button.
-     *
-     * @return The current state of the cell button.
-     */
-    public State getState() {
-        return state;
-    }
 
-    /**
-     * Checks if the cell button has been hit.
-     *
-     * @return True if the cell button is hit, otherwise false.
-     */
-    public boolean isHit() {
-        return isHit;
-    }
 
-    /**
-     * Sets whether the cell button is aimed.
-     *
-     * @param aimed True to set the cell button as aimed, false otherwise.
-     */
-    public void setAimed(boolean aimed) {
-        isAimed = aimed;
-    }
-
-    /**
-     * Checks if the cell button is aimed.
-     *
-     * @return True if the cell button is aimed, otherwise false.
-     */
-    public boolean getAimed() {
-        return isAimed;
-    }
-
-    /**
-     * Returns the row coordinate of the cell button.
-     *
-     * @return The row coordinate of the cell button.
-     */
-    public int getRow() {
-        return row;
-    }
-
-    /**
-     * Returns the column coordinate of the cell button.
-     *
-     * @return The column coordinate of the cell button.
-     */
-    public int getCol() {
-        return col;
-    }
-
-    /**
-     * Returns the JavaFX Node associated with the cell button.
-     *
-     * @return The JavaFX Node associated with the cell button.
-     */
-    public Node getNode() {
-        return node;
-    }
-
-    /**
-     * Sets the JavaFX Node associated with the cell button.
-     *
-     * @param node The JavaFX Node to associate with the cell button.
-     */
-    public void setNode(Node node) {
-        this.node = node;
-    }
+    /*@ public normal_behavior
+      @ ensures this.node == n;
+      @ assignable node;
+      @*/
+    public void setNode(Object n) { this.node = n; }
 }

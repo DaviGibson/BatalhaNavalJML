@@ -4,21 +4,38 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Represents a game board consisting of cells and ships.
- */
+/*@ 
+  @ // --- Invariantes globais do tabuleiro ---
+  @ public invariant cells != null && cells.length == 10 
+  @          && cells[0].length == 10;
+  @ public invariant ships != null;
+  @ public invariant numShips == ships.size();
+  @ public invariant 
+  @   (\forall int r, c; 0 <= r && r < 10 && 0 <= c && c < 10;
+  @       cells[r][c] != null);
+  @*/
+
 public class Board {
+
     private CellButton[][] cells;
     private List<Ship> ships;
     private int numShips;
 
-    /**
-     * Constructs a Board with a grid of 10x10 cells and initializes ships list.
-     */
+    /*@ public normal_behavior
+      @   ensures cells.length == 10 && cells[0].length == 10;
+      @   ensures ships.isEmpty();
+      @   ensures numShips == 0;
+      @   ensures (\forall int r, c; 0 <= r && r < 10 && 0 <= c && c < 10;
+      @               cells[r][c].getRow() == r 
+      @            && cells[r][c].getCol() == c
+      @            && cells[r][c].getState() == CellButton.State.WATER);
+      @ assignable this.cells, this.ships, this.numShips;
+      @*/
     public Board() {
         cells = new CellButton[10][10];
         ships = new ArrayList<>();
         numShips = 0;
+
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
                 cells[row][col] = new CellButton(row, col);
@@ -26,28 +43,35 @@ public class Board {
         }
     }
 
-    /**
-     * Places a ship on the board starting from the specified initial cell.
-     *
-     * @param ship The ship to place on the board.
-     * @param cellIni The initial cell where the ship starts.
-     */
+    /*@ public normal_behavior
+      @   requires ship != null;
+      @   requires cellIni != null;
+      @   ensures ships.contains(ship);
+      @   ensures numShips == \old(numShips) + 1;
+      @   ensures (\forall CellButton c; ship.getPosition().contains(c);
+      @                 c.getState() == CellButton.State.SHIP);
+      @ assignable ships, numShips,
+      @            (\forall int i; 0 <= i && i < ship.getPosition().size();
+      @                ship.getPosition().get(i).state);
+      @*/
     public void placeShip(Ship ship, CellButton cellIni) {
         ship.place();
         ships.add(ship);
         numShips++;
     }
 
-    /**
-     * Hits the cell at the specified row and column coordinates.
-     * Updates the ship's status if any ship is hit.
-     *
-     * @param row The row coordinate of the cell to hit.
-     * @param col The column coordinate of the cell to hit.
-     */
+
+    /*@ public normal_behavior
+      @   requires 0 <= row && row < 10 && 0 <= col && col < 10;
+      @   ensures cells[row][col].isHit();
+      @   ensures (\exists Ship s; ships.contains(s);
+      @               !s.isAlive()) ==> numShips == \old(numShips) - 1;
+      @ assignable cells[row][col].isHit, numShips;
+      @*/
     public void hitCells(int row, int col) {
         CellButton cell = cells[row][col];
         cell.hit();
+
         for (Ship ship : ships) {
             if (!ship.isAlive()) {
                 numShips--;
@@ -55,13 +79,18 @@ public class Board {
         }
     }
 
-    /**
-     * Searches for a ship cell at the specified column and row coordinates.
-     * Marks the cell as hit if found.
-     *
-     * @param coluna The column coordinate to search.
-     * @param altura The row coordinate to search.
-     */
+
+    /*@ public normal_behavior
+      @   requires 0 <= coluna && coluna < 10;
+      @   requires 0 <= altura && altura < 10;
+      @   ensures (\exists Ship s; ships.contains(s);
+      @               (\exists CellButton c; s.getPosition().contains(c);
+      @                   c.getRow() == altura && c.getCol() == coluna))
+      @          ==> cells[altura][coluna].isHit();
+      @ assignable 
+      @   (\forall int r, c; 0 <= r && r < 10 && 0 <= c && c < 10;
+      @        cells[r][c].isHit);
+      @*/
     public void buscarCellNavio(int coluna, int altura) {
         for (Ship ship : ships) {
             for (CellButton cell : ship.getPosition()) {
@@ -72,9 +101,12 @@ public class Board {
         }
     }
 
-    /**
-     * Updates the list of ships, removing ships that are no longer alive.
-     */
+
+    /*@ public normal_behavior
+      @   ensures (\forall Ship s; ships.contains(s); s.isAlive());
+      @   ensures numShips == ships.size();
+      @ assignable ships, numShips;
+      @*/
     public void attListaNavios() {
         Iterator<Ship> iterator = ships.iterator();
         while (iterator.hasNext()) {
@@ -83,17 +115,19 @@ public class Board {
                 iterator.remove();
             }
         }
+        numShips = ships.size();
     }
 
-    /**
-     * Retrieves the cell button at the specified row and column coordinates.
-     * Throws an exception if the coordinates are out of the board's range.
-     *
-     * @param row The row coordinate of the cell button.
-     * @param col The column coordinate of the cell button.
-     * @return The CellButton object at the specified coordinates.
-     * @throws ArrayIndexOutOfBoundsException if the coordinates are out of bounds.
-     */
+
+    /*@ public normal_behavior
+      @   requires 0 <= row && row < 10 && 0 <= col && col < 10;
+      @   ensures \result == cells[row][col];
+      @ pure
+      @ also
+      @ exceptional_behavior
+      @   requires row < 0 || row >= 10 || col < 0 || col >= 10;
+      @   signals_only ArrayIndexOutOfBoundsException;
+      @*/
     public CellButton getCell(int row, int col) {
         if (row >= 10 || col >= 10 || row < 0 || col < 0) {
             throw new ArrayIndexOutOfBoundsException("Você mirou numa célula fora do alcance do tabuleiro");
@@ -102,29 +136,27 @@ public class Board {
         }
     }
 
-    /**
-     * Sets the number of ships currently on the board.
-     *
-     * @param numShips The number of ships to set.
-     */
+
+    /*@ public normal_behavior
+      @   ensures this.numShips == numShips;
+      @ assignable this.numShips;
+      @*/
     public void setNumShips(int numShips) {
         this.numShips = numShips;
     }
 
-    /**
-     * Retrieves the list of ships currently on the board.
-     *
-     * @return The list of Ship objects on the board.
-     */
+    /*@ public normal_behavior
+      @   ensures \result == ships;
+      @ pure
+      @*/
     public List<Ship> getShips() {
         return ships;
     }
 
-    /**
-     * Retrieves the number of ships currently on the board.
-     *
-     * @return The number of ships on the board.
-     */
+    /*@ public normal_behavior
+      @   ensures \result == numShips;
+      @ pure
+      @*/
     public int getNumShips() {
         return numShips;
     }
