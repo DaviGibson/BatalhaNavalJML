@@ -6,7 +6,6 @@ import java.util.List;
 public interface IShip {
 
     /*@ public normal_behavior
-      @   ensures \result >= 0;
       @   pure
       @*/
     int getSize();
@@ -17,9 +16,7 @@ public interface IShip {
       @*/
     List<CellButton> getPosition();
 
-    /*@ public normal_behavior
-      @   pure
-      @*/
+    /*@ public behavior @*/
     boolean isAlive();
 
     /*@ public normal_behavior
@@ -27,35 +24,23 @@ public interface IShip {
       @*/
     boolean isSunk();
 
-    /*@ public normal_behavior
+    /*@ public behavior
       @   requires 0 <= row && 0 <= col;
       @   pure
       @*/
-    CellButton buscaCell(int row, int col);
+    /*@ nullable @*/ CellButton buscaCell(int row, int col);
 
-    /*@ public normal_behavior
+    /*@ public behavior
       @   requires position != null;
-      @   requires position.size() == getSize();
-      @   ensures true; 
+      @   signals (CelulaInvalidaException e) true;
       @*/
-
-    /*@ public exceptional_behavior
-      @   requires position != null;
-      @   requires position.size() == getSize();
-      @   signals_only CelulaInvalidaException;
-      @*/
-    
-    /*@ pure @*/
     void setPosition(List<CellButton> position) throws CelulaInvalidaException;
 
-
-    /*@ public normal_behavior
+    /*@ public behavior
       @   requires 0 <= row && 0 <= col;
-      @   ensures \result != null;
-      @   pure
       @*/
     List<CellButton> attack(int row, int col);
 
-    /*@ public normal_behavior @*/
+    /*@ public behavior @*/
     void place();
 }

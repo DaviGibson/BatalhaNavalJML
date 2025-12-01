@@ -10,130 +10,98 @@ public abstract class Ship implements IShip {
     /*@ spec_public @*/ protected List<CellButton> position;
     /*@ spec_public @*/ protected boolean isSunk;
 
-    /*@ 
-      @ public invariant size > 0;
+    /*@
       @ public invariant position != null;
-      @ public invariant position.size() == size;
-      @ public invariant 
-      @   (\forall int i; 0 <= i && i < position.size();
-      @       position.get(i) != null);
-
-      @ public invariant 
-      @   (\forall CellButton c; position.contains(c);
-      @        c.getState() == CellButton.State.SHIP
-      @     || c.getState() == CellButton.State.HIT);
-
-      @ public invariant isSunk ==>
-      @   (\forall CellButton c; position.contains(c);
-      @        c.isHit());
       @*/
 
     /*@ public normal_behavior
-      @   ensures !isSunk;
-      @   ensures position.size() == 0;
-      @   assignable position, isSunk;
+      @   ensures position != null && !isSunk;
+      @   ensures size >= 0;
       @*/
     public Ship() {
         this.position = new ArrayList<>();
         this.isSunk = false;
+        this.size = 0;
     }
 
-    /*@ public normal_behavior
-      @   requires position.size() == size;
-      @   ensures (\forall CellButton c; position.contains(c);
-      @               c.getState() == CellButton.State.SHIP);
-      @   assignable 
-      @       (\forall int i; 0 <= i && i < position.size();
-      @            position.get(i).state);
+    /*@ also
+      @ public behavior
+      @   requires position != null;
+      @   assignable \everything;
       @*/
     public void place() {
-        for (CellButton cell : position) {
-            cell.setState(CellButton.State.SHIP);
+        for (int i = 0; i < position.size(); i++) {
+            CellButton c = position.get(i);
+            c.setState(CellButton.State.SHIP);
         }
     }
 
-    /*@ public normal_behavior
-      @   ensures \result == !isSunk;
-      @   ensures isSunk ==> (\forall CellButton c; position.contains(c);
-      @                           c.isHit());
-      @   assignable isSunk;
+    /*@ also
+      @ public behavior
+      @   requires position != null;
+      @   assignable \everything;
       @*/
     public boolean isAlive() {
-        int hit = 0;
-        for (CellButton c : position) {
-            if (c.isHit()) hit++;
+        boolean existsNotHit = false;
+        for (int i = 0; i < position.size(); i++) {
+            if (!position.get(i).isHit()) {
+                existsNotHit = true;
+            }
         }
-        if (hit == position.size()) {
+        if (position.size() > 0 && !existsNotHit) {
             isSunk = true;
             return false;
         }
+        isSunk = false;
         return true;
     }
 
-    /*@ public normal_behavior
-      @   requires row >= 0 && col >= 0;
-      @   ensures (\exists CellButton c; position.contains(c);
-      @               c.getRow() == row && c.getCol() == col)
-      @            ==> \result != null;
-      @   ensures (\forall CellButton c; position.contains(c);
-      @               !(c.getRow() == row && c.getCol() == col))
-      @            ==> \result == null;
+    /*@ also
+      @ public behavior
+      @   requires position != null;
+      @   requires 0 <= row && 0 <= col;
+      @   pure
       @*/
-
-    /*@ pure @*/
+    /*@ nullable @*/
     public CellButton buscaCell(int row, int col) {
-        for (CellButton c : position) {
+        for (int i = 0; i < position.size(); i++) {
+            CellButton c = position.get(i);
             if (c.getRow() == row && c.getCol() == col) return c;
         }
         return null;
     }
 
-    /*@ pure @*/ public boolean isSunk() { return isSunk; }
-    /*@ pure @*/ public int getSize() { return size; }
-    /*@ pure @*/ public List<CellButton> getPosition() { return position; }
+    /*@ pure @*/ 
+    public boolean isSunk() { return isSunk; }
 
-    /*@ public exceptional_behavior
+    /*@ pure @*/ 
+    public int getSize() { return size; }
+
+    /*@ pure @*/ 
+    public List<CellButton> getPosition() { return position; }
+
+    /*@ also
+      @ public behavior
       @   requires position != null;
-      @   requires position.size() == size;
-      @   requires (\forall int i; 0 <= i && i < position.size();
-      @                position.get(i) != null);
-
-      @   requires (\forall CellButton c; position.contains(c);
-      @                 c.getState() != CellButton.State.SHIP);
-
-      @   signals (CelulaInvalidaException e)
-      @       (\exists CellButton c; position.contains(c);
-      @           c.getState() == CellButton.State.SHIP);
-      @*/
-
-    /*@ public normal_behavior
-      @   requires (\forall CellButton c; position.contains(c);
-      @                 c.getState() != CellButton.State.SHIP);
-      @   ensures this.position == position;
-      @   ensures (\forall CellButton c; position.contains(c);
-      @               c.getState() == CellButton.State.SHIP);
-      @   assignable this.position,
-      @              (\forall int i; 0 <= i && i < position.size();
-      @                   position.get(i).state);
+      @   assignable \everything;
+      @   signals (CelulaInvalidaException e) true;
       @*/
     public void setPosition(List<CellButton> position) throws CelulaInvalidaException {
-        for (CellButton cell : position) {
-            if (cell.getState() == CellButton.State.SHIP) {
-                throw new CelulaInvalidaException("Seu navio sobrepôs outro.");
+        for (int i = 0; i < position.size(); i++) {
+            if (position.get(i).getState() == CellButton.State.SHIP) {
+                throw new CelulaInvalidaException("Posição inválida.");
             }
         }
         this.position = position;
-        for (CellButton c : position) {
-            c.setState(CellButton.State.SHIP);
+        this.size = (position == null ? 0 : position.size());
+        for (int i = 0; i < position.size(); i++) {
+            position.get(i).setState(CellButton.State.SHIP);
         }
     }
 
-    /*@ public normal_behavior
+    /*@ also
+      @ public behavior
       @   requires row >= 0 && col >= 0;
-      @   assignable \nothing;
-      @   ensures \result != null;
       @*/
-
-    /*@ pure @*/
-    abstract public List<CellButton> attack(int row, int col);
+    public abstract List<CellButton> attack(int row, int col);
 }

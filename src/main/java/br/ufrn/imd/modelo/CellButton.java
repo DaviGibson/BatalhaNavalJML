@@ -1,6 +1,5 @@
 package br.ufrn.imd.modelo;
 
-// campos devem ser visíveis ao JML
 public class CellButton {
 
     //@ public invariant 0 <= row && row < 10;
@@ -31,19 +30,17 @@ public class CellButton {
         this.isAimed = false;
     }
 
-
-
     /*@ public normal_behavior
-      @ ensures isHit == true;
-      @ assignable isHit;
+      @   ensures isHit == true;
+      @   assignable isHit;
       @*/
     public void hit() {
         if (!isHit) isHit = true;
     }
 
     /*@ public normal_behavior
-      @ ensures state == State.WATER && !isHit;
-      @ assignable state, isHit;
+      @   ensures state == State.WATER && !isHit;
+      @   assignable state, isHit;
       @*/
     public void reset() {
         state = State.WATER;
@@ -51,16 +48,15 @@ public class CellButton {
     }
 
     /*@ public normal_behavior
-      @ ensures (\old(state) != State.SHIP) ==> state == State.WATER;
-      @ ensures (\old(state) == State.SHIP) ==> state == State.SHIP;
-      @ assignable state;
+      @   ensures (\old(state) != State.SHIP) ==> state == State.WATER;
+      @   ensures (\old(state) == State.SHIP) ==> state == State.SHIP;
+      @   assignable state;
       @*/
     public void undoShipPositioning() {
         if (state != State.SHIP) {
             state = State.WATER;
         }
     }
-
 
     /*@ public normal_behavior
       @   requires isHit || s == State.WATER || s == State.SHIP;
@@ -69,16 +65,18 @@ public class CellButton {
       @*/
     public void setState(State s) { this.state = s; }
 
-
-    /*@ pure @*/
+    /*@ public normal_behavior
+      @   ensures \result == state;
+      @   pure
+      @*/
     public State getState() { return state; }
 
     /*@ pure @*/
     public boolean isHit() { return isHit; }
 
     /*@ public normal_behavior
-      @ ensures this.isAimed == a;
-      @ assignable isAimed;
+      @   ensures this.isAimed == a;
+      @   assignable isAimed;
       @*/
     public void setAimed(boolean a) { isAimed = a; }
 
@@ -94,17 +92,14 @@ public class CellButton {
     /*@ public normal_behavior
       @   ensures \result == node;
       @*/
-
     /*@ pure nullable @*/
     public Object getNode() { 
         return node; 
     }
 
-
-
     /*@ public normal_behavior
-      @ ensures this.node == n;
-      @ assignable node;
+      @   ensures this.node == n;
+      @   assignable node;
       @*/
     public void setNode(Object n) { this.node = n; }
 }

@@ -1,6 +1,8 @@
 package br.ufrn.imd.modelo;
 
 public enum GameState {
+
+
     CLIQUE,
     POSICIONAR_CORVETA,
     POSICIONAR_SUBMARINO,
@@ -14,5 +16,6 @@ public enum GameState {
 
     SELECIONAR_ALVOS,
 
-    ENDGAME
+    ENDGAME;
+	/*@ public invariant (\forall GameState g; g != null); @*/
 }

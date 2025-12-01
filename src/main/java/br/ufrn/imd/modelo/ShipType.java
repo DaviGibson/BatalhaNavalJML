@@ -10,7 +10,6 @@ public enum ShipType {
     public final int size;
 
     /*@ 
-      @  // cada tipo sempre tem tamanho positivo
       @  public invariant size > 0;
       @*/
 
