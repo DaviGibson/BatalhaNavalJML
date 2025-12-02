@@ -4,25 +4,48 @@ import br.ufrn.imd.controle.CelulaInvalidaException;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Represents a Corvette ship in the game.
- */
 public class Corvette extends Ship {
+    /*@
+      @ public invariant size == 2;
+      @*/
 
-    /**
-     * Constructs a Corvette ship with a size of 2.
-     */
+    /*@ 
+      @ public normal_behavior
+      @    ensures this.size == 2;
+      @    ensures position != null && position.size() == 0;
+      @    ensures !isSunk;
+      @    assignable size, position, isSunk;
+      @*/
     public Corvette() {
         super();
         this.size = 2;
     }
 
-    /**
-     * Constructs a Corvette ship with a size of 2 and places it on the board at the specified positions.
-     *
-     * @param posicoes The list of CellButton positions where the ship will be placed.
-     * @throws CelulaInvalidaException If the ship overlaps with another ship on any cell.
-     */
+    /*@ 
+      @ public normal_behavior
+      @    requires posicoes != null;
+      @    requires posicoes.size() == 2; // Corvette deve ter 2 posições.
+      @    // Nenhuma célula pode estar no estado SHIP.
+      @    requires (\forall int i; 0 <= i && i < posicoes.size(); 
+      @                posicoes.get(i) != null && 
+      @                posicoes.get(i).getState() != CellButton.State.SHIP);
+      @
+      @    ensures this.size == 2;
+      @    ensures this.position == posicoes;
+      @    ensures !isSunk;
+      @    ensures (\forall int i; 0 <= i && i < posicoes.size(); 
+      @                posicoes.get(i).getState() == CellButton.State.SHIP);
+      @    assignable size, position, isSunk,
+      @               (\forall int i; 0 <= i && i < posicoes.size(); posicoes.get(i).state);
+      @
+      @ also
+      @ public exceptional_behavior
+      @    signals_only CelulaInvalidaException;
+      @    signals (CelulaInvalidaException) 
+      @      (\exists int i; 0 <= i && i < posicoes.size(); 
+      @          posicoes.get(i) != null && posicoes.get(i).getState() == CellButton.State.SHIP);
+      @    assignable \nothing;
+      @*/
     public Corvette(List<CellButton> posicoes) throws CelulaInvalidaException {
         super();
         for (CellButton cell : posicoes) {
@@ -38,13 +61,14 @@ public class Corvette extends Ship {
         position = posicoes;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @param row The row coordinate to attack.
-     * @param col The column coordinate to attack.
-     * @return A list containing the attacked cell.
-     */
+    /*@ 
+      @ public normal_behavior
+      @    requires row >= 0 && col >= 0;
+      @    ensures \result != null;
+      @    ensures \result.size() == 1;
+      @    ensures \result.get(0).row == row && \result.get(0).col == col;
+      @    assignable \nothing;
+      @*/
     @Override
     public List<CellButton> attack(int row, int col) {
         List<CellButton> list = new ArrayList<>();
