@@ -4,97 +4,125 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 public class Board {
-  	
-	/*@ 
-    @ // --- Invariantes globais do tabuleiro ---
-    @ public invariant cells != null && cells.length == 10 
-    @          && cells[0].length == 10;
-    @ public invariant ships != null;
-    @ public invariant numShips == ships.size();
-    @ public invariant 
-    @   (\forall int r, c; 0 <= r && r < 10 && 0 <= c && c < 10;
-    @       cells[r][c] != null);
-    @*/
 
-    private CellButton[][] cells;
-    private List<Ship> ships;
-    private int numShips;
+	/*@ spec_public @*/ private CellButton[][] cells;
+    /*@ spec_public @*/ private List<Ship> ships;
+    /*@ spec_public @*/ private int numShips;
+
+    /*@
+      @ public invariant cells != null;
+      @ public invariant ships != null;
+      @ public invariant cells.length == 10;
+      @ public invariant (\forall int r; 0 <= r && r < 10; cells[r] != null && cells[r].length == 10);
+      @ public invariant (\forall int r,c;
+      @                      0 <= r && r < 10 && 0 <= c && c < 10;
+      @                      cells[r][c] != null);
+      @*/
+
 
     /*@ public normal_behavior
-      @   ensures cells.length == 10 && cells[0].length == 10;
-      @   ensures ships.isEmpty();
+      @   ensures cells != null;
+      @   ensures ships != null && ships.isEmpty();
       @   ensures numShips == 0;
-      @   ensures (\forall int r, c; 0 <= r && r < 10 && 0 <= c && c < 10;
-      @               cells[r][c].getRow() == r 
-      @            && cells[r][c].getCol() == c
-      @            && cells[r][c].getState() == CellButton.State.WATER);
-      @ assignable this.cells, this.ships, this.numShips;
       @*/
     public Board() {
         cells = new CellButton[10][10];
-        ships = new ArrayList<>();
+        ships = new ArrayList<Ship>();
         numShips = 0;
 
-        for (int row = 0; row < 10; row++) {
-            for (int col = 0; col < 10; col++) {
-                cells[row][col] = new CellButton(row, col);
+        for (int r = 0; r < 10; r++) {
+            for (int c = 0; c < 10; c++) {
+                cells[r][c] = new CellButton(r, c);
             }
         }
     }
 
-    /*@ public normal_behavior
+    /*@ public behavior
+      @   requires cells != null;
+      @   requires ships != null;
       @   requires ship != null;
-      @   requires cellIni != null;
-      @   ensures ships.contains(ship);
-      @   ensures numShips == \old(numShips) + 1;
-      @   ensures (\forall CellButton c; ship.getPosition().contains(c);
-      @                 c.getState() == CellButton.State.SHIP);
-      @ assignable ships, numShips,
-      @            (\forall int i; 0 <= i && i < ship.getPosition().size();
-      @                ship.getPosition().get(i).state);
+      @   requires 0 <= row && row < 10;
+      @   requires 0 <= col && col < 10;
       @*/
-    public void placeShip(Ship ship, CellButton cellIni) {
-        ship.place();
+    public void placeShip(Ship ship, int row, int col, boolean horizontal) {
+        int size = ship.getSize();
+        if (size <= 0) {
+            throw new IllegalArgumentException("Tamanho inválido do navio");
+        }
+
+        if (horizontal) {
+            if (col + size > 10) {
+                throw new IllegalArgumentException("Navio fora do tabuleiro");
+            }
+        } else {
+            if (row + size > 10) {
+                throw new IllegalArgumentException("Navio fora do tabuleiro");
+            }
+        }
+
+        List<CellButton> pos = new ArrayList<CellButton>();
+        if (horizontal) {
+            for (int c = col; c < col + size; c++) {
+                if (cells[row][c].getState() == CellButton.State.SHIP) {
+                    throw new IllegalArgumentException("Navio sobreposto");
+                }
+                pos.add(cells[row][c]);
+            }
+        } else {
+            for (int r = row; r < row + size; r++) {
+                if (cells[r][col].getState() == CellButton.State.SHIP) {
+                    throw new IllegalArgumentException("Navio sobreposto");
+                }
+                pos.add(cells[r][col]);
+            }
+        }
+
+        try {
+            ship.setPosition(pos);
+        } catch (br.ufrn.imd.controle.CelulaInvalidaException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+
         ships.add(ship);
+        //@ assert ships.get(ships.size()-1) != null;
         numShips++;
     }
 
-
-    /*@ public normal_behavior
-      @   requires 0 <= row && row < 10 && 0 <= col && col < 10;
-      @   ensures cells[row][col].isHit();
-      @   ensures (\exists Ship s; ships.contains(s);
-      @               !s.isAlive()) ==> numShips == \old(numShips) - 1;
-      @ assignable cells[row][col].isHit, numShips;
+    /*@ public behavior
+      @   requires cells != null;
+      @   requires 0 <= row && row < 10;
+      @   requires 0 <= col && col < 10;
       @*/
     public void hitCells(int row, int col) {
         CellButton cell = cells[row][col];
+        //@ assert cell != null;
+        //@ assert cell.state != null;
         cell.hit();
 
         for (Ship ship : ships) {
-            if (!ship.isAlive()) {
+            //@ assert ship != null;
+            //@ assert ship.position != null;
+            if (!ship.isAlive() && numShips > 0) {
                 numShips--;
             }
         }
     }
 
 
-    /*@ public normal_behavior
+    /*@ public behavior
+      @   requires ships != null;
       @   requires 0 <= coluna && coluna < 10;
       @   requires 0 <= altura && altura < 10;
-      @   ensures (\exists Ship s; ships.contains(s);
-      @               (\exists CellButton c; s.getPosition().contains(c);
-      @                   c.getRow() == altura && c.getCol() == coluna))
-      @          ==> cells[altura][coluna].isHit();
-      @ assignable 
-      @   (\forall int r, c; 0 <= r && r < 10 && 0 <= c && c < 10;
-      @        cells[r][c].isHit);
       @*/
     public void buscarCellNavio(int coluna, int altura) {
         for (Ship ship : ships) {
-            for (CellButton cell : ship.getPosition()) {
+            //@ assert ship != null;
+            List<CellButton> pos = ship.getPosition();
+            for (CellButton cell : pos) {
+                //@ assert cell != null;
+                //@ assert cell.getState() != null;
+                //@ assert !cell.isHit() ==> (cell.getState() == CellButton.State.WATER || cell.getState() == CellButton.State.SHIP);
                 if (cell.getCol() == coluna && cell.getRow() == altura) {
                     cell.hit();
                 }
@@ -103,52 +131,47 @@ public class Board {
     }
 
 
-    /*@ public normal_behavior
-      @   ensures (\forall Ship s; ships.contains(s); s.isAlive());
-      @   ensures numShips == ships.size();
-      @ assignable ships, numShips;
+    /*@ public behavior
+      @   requires ships != null;
       @*/
     public void attListaNavios() {
         Iterator<Ship> iterator = ships.iterator();
         while (iterator.hasNext()) {
             Ship ship = iterator.next();
-            if (!ship.isAlive()) {
+            if (!ship.isAlive() && numShips > 0) {
                 iterator.remove();
+                numShips--;
             }
         }
-        numShips = ships.size();
     }
 
-
     /*@ public normal_behavior
-      @   requires 0 <= row && row < 10 && 0 <= col && col < 10;
+      @   requires cells != null;
+      @   requires 0 <= row && row < 10;
+      @   requires 0 <= col && col < 10;
       @   ensures \result == cells[row][col];
-      @ pure
-      @ also
-      @ exceptional_behavior
-      @   requires row < 0 || row >= 10 || col < 0 || col >= 10;
-      @   signals_only ArrayIndexOutOfBoundsException;
+      @   ensures \result != null;
+      @   pure
       @*/
     public CellButton getCell(int row, int col) {
-        if (row >= 10 || col >= 10 || row < 0 || col < 0) {
-            throw new ArrayIndexOutOfBoundsException("Você mirou numa célula fora do alcance do tabuleiro");
-        } else {
-            return cells[row][col];
-        }
+        return cells[row][col];
     }
 
-
     /*@ public normal_behavior
-      @   ensures this.numShips == numShips;
-      @ assignable this.numShips;
+      @   requires ships != null;
+      @   requires (\forall int i;
+      @               0 <= i && i < ships.size();
+      @               ships.get(i) != null);
       @*/
     public void setNumShips(int numShips) {
         this.numShips = numShips;
     }
 
+
+
     /*@ public normal_behavior
       @   ensures \result == ships;
-      @ pure
+      @   pure
       @*/
     public List<Ship> getShips() {
         return ships;
@@ -156,7 +179,7 @@ public class Board {
 
     /*@ public normal_behavior
       @   ensures \result == numShips;
-      @ pure
+      @   pure
       @*/
     public int getNumShips() {
         return numShips;

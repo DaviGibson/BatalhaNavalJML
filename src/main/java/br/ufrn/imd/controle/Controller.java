@@ -154,23 +154,19 @@ public class Controller {
         Ship navio = shipFactory.get(type).get();
         int size = type.getSize();
 
-        List<CellButton> posicoes = new ArrayList<>();
-        posicoes.add(celIni);
-
-        boolean sucesso = adicionarPosicoesNavio(celIni, posicoes, size);
+        int fileira = celIni.getRow();
+        int coluna = celIni.getCol();
+        boolean horizontal = deitado;
 
         try {
-            if (sucesso) {
-                navio.setPosition(posicoes);
-                jogador.placeShip(navio, celIni);
-                updateBoard(board);
-            }
-        } catch (CelulaInvalidaException e) {
-            desfazerNavio(posicoes);
+            // deixa o Board cuidar se cabe e se não sobrepõe
+            jogador.placeShip(navio, fileira, coluna, horizontal);
             updateBoard(board);
+        } catch (IllegalArgumentException e) {
             updateLabel(e.getMessage());
         }
     }
+
 
 
     private void processarSelecaoAlvos(ShipType tipoNavio, List<CellButton> lista, int fileira, int coluna) throws ArrayIndexOutOfBoundsException, CelulaInvalidaException {
@@ -424,39 +420,40 @@ public class Controller {
      */
     private void posicionaNaviosPc(int tamanho) throws CelulaInvalidaException {
         RandomDataGenerator randomData = new RandomDataGenerator();
-        int virado = randomData.nextInt(0, 1);
+        int virado = randomData.nextInt(0, 1); // 0 = horizontal, 1 = vertical
 
         boolean sucessoPosicao;
         List<CellButton> posicoesNavio = new ArrayList<>();
         sucessoPosicao = adicionarPosicoesNavioPc(posicoesNavio, tamanho, virado);
         try {
-            if (sucessoPosicao) {
+            if (sucessoPosicao && !posicoesNavio.isEmpty()) {
+                CellButton inicio = posicoesNavio.get(0);
+                int row = inicio.getRow();
+                int col = inicio.getCol();
+                boolean horizontal = (virado == 0);
+
+                Ship ship;
                 switch (tamanho) {
                     case 2:
-                        Ship ship1 = new Corvette(posicoesNavio);
-                        computadorTabuleiro.placeShip(ship1, posicoesNavio.get(0));
-                        updateBoard(computadorTabuleiro);
+                        ship = new Corvette();
                         break;
                     case 3:
-                        Ship ship2 = new Submarine(posicoesNavio);
-                        computadorTabuleiro.placeShip(ship2, posicoesNavio.get(0));
-                        updateBoard(computadorTabuleiro);
+                        ship = new Submarine();
                         break;
                     case 4:
-                        Ship ship3 = new Frigate(posicoesNavio);
-                        computadorTabuleiro.placeShip(ship3, posicoesNavio.get(0));
-                        updateBoard(computadorTabuleiro);
+                        ship = new Frigate();
                         break;
                     case 5:
-                        Ship ship4 = new Destroyer(posicoesNavio);
-                        computadorTabuleiro.placeShip(ship4, posicoesNavio.get(0));
-                        updateBoard(computadorTabuleiro);
+                        ship = new Destroyer();
                         break;
                     default:
                         throw new IllegalArgumentException("Tamanho de navio inválido: " + tamanho);
                 }
+
+                computadorTabuleiro.placeShip(ship, row, col, horizontal);
+                updateBoard(computadorTabuleiro);
             }
-        } catch (CelulaInvalidaException e) {
+        } catch (IllegalArgumentException e) {
             updateLabel(e.getMessage());
             System.out.println(e.getMessage());
         }

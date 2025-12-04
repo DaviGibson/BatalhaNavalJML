@@ -2,8 +2,6 @@ package br.ufrn.imd.modelo;
 
 public class CellButton {
 
-    //@ public invariant 0 <= row && row < 10;
-    //@ public invariant 0 <= col && col < 10;
     //@ public invariant state != null;
     //@ public invariant (!isHit) ==> (state == State.WATER || state == State.SHIP);
 

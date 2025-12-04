@@ -7,7 +7,7 @@ import java.util.List;
 public abstract class Ship implements IShip {
 
     /*@ spec_public @*/ protected int size;
-    /*@ spec_public @*/ protected List<CellButton> position;
+    /*@ spec_public @*/ private List<CellButton> position;
     /*@ spec_public @*/ protected boolean isSunk;
 
     /*@
@@ -19,7 +19,7 @@ public abstract class Ship implements IShip {
       @   ensures size >= 0;
       @*/
     public Ship() {
-        this.position = new ArrayList<>();
+        this.position = new ArrayList<CellButton>();
         this.isSunk = false;
         this.size = 0;
     }
@@ -39,7 +39,7 @@ public abstract class Ship implements IShip {
     /*@ also
       @ public behavior
       @   requires position != null;
-      @   assignable \everything;
+      @   assignable isSunk;
       @*/
     public boolean isAlive() {
         boolean existsNotHit = false;
@@ -77,23 +77,40 @@ public abstract class Ship implements IShip {
     /*@ pure @*/ 
     public int getSize() { return size; }
 
-    /*@ pure @*/ 
-    public List<CellButton> getPosition() { return position; }
+    /*@ also
+      @ public normal_behavior
+      @   ensures \result == position;
+      @   pure
+      @*/
+    public List<CellButton> getPosition() {
+        return position;
+    }
 
     /*@ also
       @ public behavior
-      @   requires position != null;
-      @   assignable \everything;
+      @   assignable position, size;
       @   signals (CelulaInvalidaException e) true;
       @*/
-    public void setPosition(List<CellButton> position) throws CelulaInvalidaException {
-        for (int i = 0; i < position.size(); i++) {
-            if (position.get(i).getState() == CellButton.State.SHIP) {
+    public void setPosition(List<CellButton> posicoes) throws CelulaInvalidaException {
+        if (posicoes == null) {
+            this.position = new ArrayList<CellButton>();
+            this.size = 0;
+            return;
+        }
+
+        // valida sobreposição
+        for (int i = 0; i < posicoes.size(); i++) {
+            CellButton cell = posicoes.get(i);
+            if (cell.getState() == CellButton.State.SHIP) {
                 throw new CelulaInvalidaException("Posição inválida.");
             }
         }
-        this.position = position;
-        this.size = (position == null ? 0 : position.size());
+
+        // copia as posições para a lista interna
+        this.position = new ArrayList<CellButton>(posicoes);
+        this.size = posicoes.size();
+
+        // marca as células como SHIP
         for (int i = 0; i < position.size(); i++) {
             position.get(i).setState(CellButton.State.SHIP);
         }

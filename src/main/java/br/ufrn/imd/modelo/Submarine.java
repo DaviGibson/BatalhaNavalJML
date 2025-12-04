@@ -25,15 +25,9 @@ public class Submarine extends Ship {
      */
     public Submarine(List<CellButton> posicoes) throws CelulaInvalidaException {
         super();
-        for (CellButton cell : posicoes) {
-            if (cell.getState() == CellButton.State.SHIP) {
-                throw new CelulaInvalidaException("Você tentou posicionar um navio numa célula onde outro navio já ocupa");
-            } else {
-                cell.setState(CellButton.State.SHIP);
-            }
-        }
         this.size = 3;
-        position = posicoes;
+        // valida e marca via Ship.setPosition
+        setPosition(posicoes);
     }
 
     /**
