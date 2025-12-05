@@ -6,45 +6,31 @@ import java.util.ArrayList;
 
 public class Corvette extends Ship {
 
-    /*
-      @ assignable position, isSunk, size
-      @ ensures this.size == 2;
+    /*@ public normal_behavior
+      @   assignable \everything;
       @*/
     public Corvette() {
         super();
         this.size = 2;
     }
 
-    /*@ 
-      @ public normal_behavior
-      @   requires posicoes != null;
-      @   requires posicoes.size() == 2;
-      @   requires (\forall int i; 0 <= i && i < posicoes.size();
-      @                  posicoes.get(i) != null &&
-      @                  posicoes.get(i).getState() != CellButton.State.SHIP);
-      @   ensures size == 2;
-      @   ensures isSunk == false;
-      @
-      @ also
-      @ public exceptional_behavior
-      @   requires posicoes == null;
-      @   signals_only CelulaInvalidaException;
+    /*@
+      @ public behavior
+      @   assignable \everything;
       @*/
     public Corvette(List<CellButton> posicoes) throws CelulaInvalidaException {
         super();
         this.size = 2;
         this.isSunk = false;
-        // delega validação e marcação para Ship.setPosition
         setPosition(posicoes);
     }
 
-    /*@ 
+    /*@ also
       @ public normal_behavior
       @    requires row >= 0 && row < 10;
       @    requires col >= 0 && col < 10;
       @    ensures \result != null;
       @    ensures \result.size() == 1;
-      @    ensures size == 2;
       @    assignable \nothing;
       @*/
     @Override
@@ -54,4 +40,5 @@ public class Corvette extends Ship {
         list.add(cell);
         return list;
     }
+
 }

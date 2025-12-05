@@ -14,8 +14,8 @@ public class CellButton {
     public enum State { WATER, SHIP, HIT }
 
     /*@ public normal_behavior
-      @   requires 0 <= r && r < 10;
-      @   requires 0 <= c && c < 10;
+      @   requires 0 <= r;
+      @   requires 0 <= c;
       @   ensures row == r && col == c;
       @   ensures state == State.WATER && !isHit && !isAimed;
       @   pure

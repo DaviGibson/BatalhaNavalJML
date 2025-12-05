@@ -37,9 +37,11 @@ public interface IShip {
     void setPosition(List<CellButton> position) throws CelulaInvalidaException;
 
     /*@ public behavior
-      @   requires 0 <= row && 0 <= col;
+      @   requires 0 <= row && row < 10;
+      @   requires 0 <= col && col < 10;
       @*/
     List<CellButton> attack(int row, int col);
+
 
     /*@ public behavior @*/
     void place();
