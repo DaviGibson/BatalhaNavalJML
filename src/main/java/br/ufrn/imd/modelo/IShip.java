@@ -6,13 +6,13 @@ import java.util.List;
 public interface IShip {
 
     /*@ public normal_behavior
-      @   pure
+      @   spec_pure
       @*/
     int getSize();
 
     /*@ public normal_behavior
       @   ensures \result != null;
-      @   pure
+      @   spec_pure
       @*/
     List<CellButton> getPosition();
 
@@ -20,13 +20,13 @@ public interface IShip {
     boolean isAlive();
 
     /*@ public normal_behavior
-      @   pure
+      @   spec_pure
       @*/
     boolean isSunk();
 
     /*@ public behavior
       @   requires 0 <= row && 0 <= col;
-      @   pure
+      @   spec_pure
       @*/
     /*@ nullable @*/ CellButton buscaCell(int row, int col);
 

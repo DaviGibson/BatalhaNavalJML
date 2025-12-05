@@ -60,7 +60,7 @@ public abstract class Ship implements IShip {
       @ public behavior
       @   requires position != null;
       @   requires 0 <= row && 0 <= col;
-      @   pure
+      @   spec_pure
       @*/
     /*@ nullable @*/
     public CellButton buscaCell(int row, int col) {
@@ -71,16 +71,16 @@ public abstract class Ship implements IShip {
         return null;
     }
 
-    /*@ pure @*/ 
+    /*@ spec_pure @*/ 
     public boolean isSunk() { return isSunk; }
 
-    /*@ pure @*/ 
+    /*@ spec_pure @*/ 
     public int getSize() { return size; }
 
     /*@ also
       @ public normal_behavior
       @   ensures \result == position;
-      @   pure
+      @   spec_pure
       @*/
     public List<CellButton> getPosition() {
         return position;

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Board {
 
-	/*@ spec_public @*/ private CellButton[][] cells;
+    /*@ spec_public @*/ private CellButton[][] cells;
     /*@ spec_public @*/ private List<Ship> ships;
     /*@ spec_public @*/ private int numShips;
 
@@ -19,7 +19,6 @@ public class Board {
       @                      0 <= r && r < 10 && 0 <= c && c < 10;
       @                      cells[r][c] != null);
       @*/
-
 
     /*@ public normal_behavior
       @   ensures cells != null;
@@ -109,7 +108,6 @@ public class Board {
         }
     }
 
-
     /*@ public behavior
       @   requires ships != null;
       @   requires 0 <= coluna && coluna < 10;
@@ -129,7 +127,6 @@ public class Board {
             }
         }
     }
-
 
     /*@ public behavior
       @   requires ships != null;
@@ -151,7 +148,7 @@ public class Board {
       @   requires 0 <= col && col < 10;
       @   ensures \result == cells[row][col];
       @   ensures \result != null;
-      @   pure
+      @   spec_pure
       @*/
     public CellButton getCell(int row, int col) {
         return cells[row][col];
@@ -167,11 +164,9 @@ public class Board {
         this.numShips = numShips;
     }
 
-
-
     /*@ public normal_behavior
       @   ensures \result == ships;
-      @   pure
+      @   spec_pure
       @*/
     public List<Ship> getShips() {
         return ships;
@@ -179,7 +174,7 @@ public class Board {
 
     /*@ public normal_behavior
       @   ensures \result == numShips;
-      @   pure
+      @   spec_pure
       @*/
     public int getNumShips() {
         return numShips;

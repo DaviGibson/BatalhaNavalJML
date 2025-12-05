@@ -17,7 +17,7 @@ public enum ShipType {
         this.size = size;
     }
 
-    /*@ pure @*/
+    /*@ spec_pure @*/
     public int getSize() {
         return size;
     }

@@ -65,11 +65,11 @@ public class CellButton {
 
     /*@ public normal_behavior
       @   ensures \result == state;
-      @   pure
+      @   spec_pure
       @*/
     public State getState() { return state; }
 
-    /*@ pure @*/
+    /*@ spec_pure @*/
     public boolean isHit() { return isHit; }
 
     /*@ public normal_behavior
@@ -78,19 +78,19 @@ public class CellButton {
       @*/
     public void setAimed(boolean a) { isAimed = a; }
 
-    /*@ pure @*/
+    /*@ spec_pure @*/
     public boolean getAimed() { return isAimed; }
 
-    /*@ pure @*/
+    /*@ spec_pure @*/
     public int getRow() { return row; }
 
-    /*@ pure @*/
+    /*@ spec_pure @*/
     public int getCol() { return col; }
 
     /*@ public normal_behavior
       @   ensures \result == node;
       @*/
-    /*@ pure nullable @*/
+    /*@ spec_pure nullable @*/
     public Object getNode() { 
         return node; 
     }
