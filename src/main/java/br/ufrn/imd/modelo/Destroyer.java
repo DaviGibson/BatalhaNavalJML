@@ -4,50 +4,52 @@ import br.ufrn.imd.controle.CelulaInvalidaException;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Represents a Destroyer ship in the game.
- */
 public class Destroyer extends Ship {
 
-    /**
-     * Constructs a Destroyer ship with a size of 5.
-     */
+    /*@ public normal_behavior
+      @   assignable \everything;
+      @*/
     public Destroyer() {
         super();
         this.size = 5;
     }
 
-    /**
-     * Constructs a Destroyer ship with a size of 5 and places it on the board at the specified positions.
-     *
-     * @param posicoes The list of CellButton positions where the ship will be placed.
-     * @throws CelulaInvalidaException If the ship overlaps with another ship on any cell.
-     */
+    /*@
+      @ public behavior
+      @   assignable \everything;
+      @*/
     public Destroyer(List<CellButton> posicoes) throws CelulaInvalidaException {
         super();
         this.size = 5;
-        // valida e marca via Ship.setPosition
+        this.isSunk = false;
         setPosition(posicoes);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Destroyer attacks three cells: the clicked cell, the cell to its left, and the cell to its right.
-     *
-     * @param row The row coordinate to attack.
-     * @param col The column coordinate to attack.
-     * @return A list containing the attacked cells.
-     */
+    /*@ also
+      @ public normal_behavior
+      @    requires row >= 0;
+      @    requires col >= 0;
+      @    ensures \result != null;
+      @    ensures \result.size() >= 1 && \result.size() <= 3;
+      @    assignable \nothing;
+      @*/
     @Override
     public List<CellButton> attack(int row, int col) {
         List<CellButton> list = new ArrayList<>();
-        CellButton cell1 = new CellButton(row, col);
-        CellButton cell2 = new CellButton(row, col + 1);
-        CellButton cell3 = new CellButton(row, col - 1);
-        list.add(cell1);
-        list.add(cell2);
-        list.add(cell3);
+
+        // célula central
+        list.add(new CellButton(row, col));
+
+        // célula à direita
+        if (col + 1 < 10) {
+            list.add(new CellButton(row, col + 1));
+        }
+
+        // célula à esquerda
+        if (col - 1 >= 0) {
+            list.add(new CellButton(row, col - 1));
+        }
+
         return list;
     }
 }

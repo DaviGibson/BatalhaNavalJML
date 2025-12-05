@@ -27,8 +27,11 @@ public class Player {
       @   assignable \everything;
       @*/
     public void placeShip(Ship ship, int row, int col, boolean horizontal) {
+    	// uso local com assert, para guiar o provador
+        List<Ship> localShips = this.ships;
+        //@ assert localShips != null;
         board.placeShip(ship, row, col, horizontal);
-        ships.add(ship);
+        localShips.add(ship);
     }
 
     /*@ public normal_behavior

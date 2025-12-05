@@ -625,13 +625,16 @@ public class Controller {
             }
         }
 
+        // remove navios afundados (tanto do jogador quanto do PC, dependendo de 'b')
+        List<Ship> toRemove = new ArrayList<>();
         for (Ship ship : b.getShips()) {
             if (!ship.isAlive()) {
-                b.setNumShips(b.getNumShips() -1);
+                toRemove.add(ship);
             }
         }
-
+        b.getShips().removeAll(toRemove);
     }
+
 
     /**
      * Atualiza o estado visual do tabuleiro.

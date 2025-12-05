@@ -4,50 +4,52 @@ import br.ufrn.imd.controle.CelulaInvalidaException;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Represents a Frigate ship in the game.
- */
 public class Frigate extends Ship {
 
-    /**
-     * Constructs a Frigate ship with a size of 4.
-     */
+    /*@ public normal_behavior
+      @   assignable \everything;
+      @*/
     public Frigate() {
         super();
         this.size = 4;
     }
 
-    /**
-     * Constructs a Frigate ship with a size of 4 and places it on the board at the specified positions.
-     *
-     * @param posicoes The list of CellButton positions where the ship will be placed.
-     * @throws CelulaInvalidaException If the ship overlaps with another ship on any cell.
-     */
+    /*@
+      @ public behavior
+      @   assignable \everything;
+      @*/
     public Frigate(List<CellButton> posicoes) throws CelulaInvalidaException {
         super();
         this.size = 4;
-        // valida e marca via Ship.setPosition
+        this.isSunk = false;
         setPosition(posicoes);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Frigate attacks three cells: the clicked cell, the cell above it, and the cell below it.
-     *
-     * @param row The row coordinate to attack.
-     * @param col The column coordinate to attack.
-     * @return A list containing the attacked cells.
-     */
+    /*@ also
+      @ public normal_behavior
+      @    requires row >= 0;
+      @    requires col >= 0;
+      @    ensures \result != null;
+      @    ensures \result.size() >= 1 && \result.size() <= 3;
+      @    assignable \nothing;
+      @*/
     @Override
     public List<CellButton> attack(int row, int col) {
         List<CellButton> list = new ArrayList<>();
-        CellButton cell1 = new CellButton(row, col);
-        CellButton cell2 = new CellButton(row + 1, col);
-        CellButton cell3 = new CellButton(row - 1, col);
-        list.add(cell1);
-        list.add(cell2);
-        list.add(cell3);
+
+        // sempre a célula central
+        list.add(new CellButton(row, col));
+
+        // célula abaixo, se fizer sentido dentro do tabuleiro lógico
+        if (row + 1 < 10) {
+            list.add(new CellButton(row + 1, col));
+        }
+
+        // célula acima, se fizer sentido dentro do tabuleiro lógico
+        if (row - 1 >= 0) {
+            list.add(new CellButton(row - 1, col));
+        }
+
         return list;
     }
 }

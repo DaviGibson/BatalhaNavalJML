@@ -8,7 +8,6 @@ public class Board {
 
     /*@ spec_public @*/ private CellButton[][] cells;
     /*@ spec_public @*/ private List<Ship> ships;
-    /*@ spec_public @*/ private int numShips;
 
     /*@
       @ public invariant cells != null;
@@ -24,12 +23,10 @@ public class Board {
     /*@ public normal_behavior
       @   ensures cells != null;
       @   ensures ships != null && ships.isEmpty();
-      @   ensures numShips == 0;
       @*/
     public Board() {
         cells = new CellButton[10][10];
         ships = new ArrayList<Ship>();
-        numShips = 0;
 
         /*@ loop_invariant 0 <= r && r <= 10;
           @ loop_invariant cells != null && cells.length == 10;
@@ -95,7 +92,6 @@ public class Board {
         }
 
         ships.add(ship);
-        numShips++;
     }
 
     /*@ public behavior
@@ -112,17 +108,14 @@ public class Board {
 
         for (Ship ship : ships) {
             //@ assert ship != null;
-            if (!ship.isAlive() && numShips > 0) {
-                numShips--;
+            if (!ship.isAlive()) {
+                // Agora não mexe mais em contador; remoção é feita em attListaNavios/atiraCelulasMiradas
             }
         }
     }
 
     /*@ public behavior
       @   requires ships != null;
-      @   requires (\forall int i; 0 <= i && i < ships.size(); ships.get(i) != null);
-      @   requires 0 <= coluna && coluna < 10;
-      @   requires 0 <= altura && altura < 10;
       @*/
     public void buscarCellNavio(int coluna, int altura) {
         for (Ship ship : ships) {
@@ -145,9 +138,8 @@ public class Board {
         Iterator<Ship> iterator = ships.iterator();
         while (iterator.hasNext()) {
             Ship ship = iterator.next();
-            if (!ship.isAlive() && numShips > 0) {
+            if (!ship.isAlive()) {
                 iterator.remove();
-                numShips--;
             }
         }
     }
@@ -165,25 +157,10 @@ public class Board {
     }
 
     /*@ public normal_behavior
-      @   requires ships != null;
-      @*/
-    public void setNumShips(int numShips) {
-        this.numShips = numShips;
-    }
-
-    /*@ public normal_behavior
       @   ensures \result == ships;
       @   spec_pure
       @*/
     public List<Ship> getShips() {
         return ships;
-    }
-
-    /*@ public normal_behavior
-      @   ensures \result == numShips;
-      @   spec_pure
-      @*/
-    public int getNumShips() {
-        return numShips;
     }
 }

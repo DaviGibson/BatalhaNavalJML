@@ -4,48 +4,44 @@ import br.ufrn.imd.controle.CelulaInvalidaException;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * Represents a Submarine ship in the game.
- */
 public class Submarine extends Ship {
 
-    /**
-     * Constructs a Submarine ship with a size of 3.
-     */
+    /*@ public normal_behavior
+      @   assignable \everything;
+      @*/
     public Submarine() {
         super();
         this.size = 3;
     }
 
-    /**
-     * Constructs a Submarine ship with a size of 3 and places it on the board at the specified positions.
-     *
-     * @param posicoes The list of CellButton positions where the ship will be placed.
-     * @throws CelulaInvalidaException If the ship overlaps with another ship on any cell.
-     */
+    /*@
+      @ public behavior
+      @   assignable \everything;
+      @*/
     public Submarine(List<CellButton> posicoes) throws CelulaInvalidaException {
         super();
         this.size = 3;
-        // valida e marca via Ship.setPosition
+        this.isSunk = false;
         setPosition(posicoes);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Submarine attacks two cells: the clicked cell and the cell to its right.
-     *
-     * @param row The row coordinate to attack.
-     * @param col The column coordinate to attack.
-     * @return A list containing the attacked cells.
-     */
+    /*@ also
+      @ public normal_behavior
+      @    requires row >= 0;
+      @    requires col >= 0;
+      @    ensures \result != null;
+      @    ensures \result.size() >= 1 && \result.size() <= 2;
+      @    assignable \nothing;
+      @*/
     @Override
     public List<CellButton> attack(int row, int col) {
         List<CellButton> list = new ArrayList<>();
-        CellButton cell1 = new CellButton(row, col);
-        CellButton cell2 = new CellButton(row, col + 1);
-        list.add(cell1);
-        list.add(cell2);
+        list.add(new CellButton(row, col));
+        // só cria segunda célula se ainda estiver numa coluna válida do jogo
+        if (col + 1 < 10) {
+            list.add(new CellButton(row, col + 1));
+        }
         return list;
     }
+
 }
