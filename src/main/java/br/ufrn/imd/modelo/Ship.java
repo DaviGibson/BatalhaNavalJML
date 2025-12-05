@@ -118,7 +118,8 @@ public abstract class Ship implements IShip {
 
     /*@ also
       @ public behavior
-      @   requires row >= 0 && col >= 0;
+      @ requires row >= 0 && col >= 0;
+      @ assignable \nothing;
       @*/
     public abstract List<CellButton> attack(int row, int col);
 }

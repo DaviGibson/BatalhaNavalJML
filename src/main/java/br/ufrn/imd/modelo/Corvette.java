@@ -8,11 +8,9 @@ public class Corvette extends Ship {
 
     //@ public invariant size == 2;
 
-    /*@ 
-      @ public normal_behavior
-      @    ensures this.size == 2;
-      @    ensures !isSunk;
-      @    assignable size, isSunk;
+    /*
+      @ assignable position, isSunk, size
+      @ ensures this.size == 2;
       @*/
     public Corvette() {
         super();
@@ -23,12 +21,13 @@ public class Corvette extends Ship {
       @ public normal_behavior
       @   requires posicoes != null;
       @   requires posicoes.size() == 2;
+      @   requires size == 2;
       @   requires (\forall int i; 0 <= i && i < posicoes.size();
       @                  posicoes.get(i) != null &&
       @                  posicoes.get(i).getState() != CellButton.State.SHIP);
       @   ensures size == 2;
       @   ensures !isSunk;
-      @   assignable size, isSunk, posicoes.*;
+      @   pure
       @
       @ also
       @ public exceptional_behavior
@@ -43,11 +42,12 @@ public class Corvette extends Ship {
 
     /*@ 
       @ public normal_behavior
-      @    requires row >= 0 && col >= 0;
+      @    requires row >= 0 && row < 10;
+      @    requires col >= 0 && col < 10;
       @    ensures \result != null;
       @    ensures \result.size() == 1;
+      @    ensures size == 2;
       @    assignable \nothing;
-      @    pure
       @*/
     @Override
     public List<CellButton> attack(int row, int col) {

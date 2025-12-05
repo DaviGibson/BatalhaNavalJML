@@ -19,6 +19,7 @@ public class CellButton {
       @   requires 0 <= c && c < 10;
       @   ensures row == r && col == c;
       @   ensures state == State.WATER && !isHit && !isAimed;
+      @   pure
       @*/
     public CellButton(int r, int c) {
         this.row = r;
