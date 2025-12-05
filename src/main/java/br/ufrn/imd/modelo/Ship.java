@@ -10,9 +10,7 @@ public abstract class Ship implements IShip {
     /*@ spec_public @*/ private List<CellButton> position;
     /*@ spec_public @*/ protected boolean isSunk;
 
-    /*@
-      @ public invariant position != null;
-      @*/
+    //@ public invariant position != null;
 
     /*@ public normal_behavior
       @   ensures position != null && !isSunk;
@@ -71,15 +69,17 @@ public abstract class Ship implements IShip {
         return null;
     }
 
-    /*@ spec_pure @*/ 
+    /*@ spec_pure @*/
     public boolean isSunk() { return isSunk; }
 
-    /*@ spec_pure @*/ 
+    /*@ spec_pure @*/
     public int getSize() { return size; }
 
     /*@ also
       @ public normal_behavior
+      @   requires position != null;
       @   ensures \result == position;
+      @   ensures \result != null;
       @   spec_pure
       @*/
     public List<CellButton> getPosition() {
@@ -88,6 +88,12 @@ public abstract class Ship implements IShip {
 
     /*@ also
       @ public behavior
+      @   requires posicoes == null
+      @        || (\forall int i;
+      @               0 <= i && i < posicoes.size();
+      @               posicoes.get(i) != null
+      @            && posicoes.get(i).getState() != null);
+      @   ensures position != null;
       @   assignable position, size;
       @   signals (CelulaInvalidaException e) true;
       @*/
@@ -118,8 +124,8 @@ public abstract class Ship implements IShip {
 
     /*@ also
       @ public behavior
-      @ requires row >= 0 && col >= 0;
-      @ assignable \nothing;
+      @   requires row >= 0 && col >= 0;
+      @   assignable \nothing;
       @*/
     public abstract List<CellButton> attack(int row, int col);
 }

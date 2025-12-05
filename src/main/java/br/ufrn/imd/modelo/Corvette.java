@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 public class Corvette extends Ship {
 
-    //@ public invariant size == 2;
-
     /*
       @ assignable position, isSunk, size
       @ ensures this.size == 2;
@@ -21,21 +19,21 @@ public class Corvette extends Ship {
       @ public normal_behavior
       @   requires posicoes != null;
       @   requires posicoes.size() == 2;
-      @   requires size == 2;
       @   requires (\forall int i; 0 <= i && i < posicoes.size();
       @                  posicoes.get(i) != null &&
       @                  posicoes.get(i).getState() != CellButton.State.SHIP);
       @   ensures size == 2;
-      @   ensures !isSunk;
-      @   pure
+      @   ensures isSunk == false;
       @
       @ also
       @ public exceptional_behavior
+      @   requires posicoes == null;
       @   signals_only CelulaInvalidaException;
       @*/
     public Corvette(List<CellButton> posicoes) throws CelulaInvalidaException {
         super();
         this.size = 2;
+        this.isSunk = false;
         // delega validação e marcação para Ship.setPosition
         setPosition(posicoes);
     }

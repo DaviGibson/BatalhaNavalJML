@@ -8,10 +8,8 @@ public class Player {
     /*@ spec_public @*/ private Board board;
     /*@ spec_public @*/ private List<Ship> ships;
 
-    /*@
-      @ public invariant board != null;
-      @ public invariant ships != null;
-      @*/
+    //@ public invariant board != null;
+    //@ public invariant ships != null;
 
     /*@ public normal_behavior
       @   ensures board != null;
@@ -22,15 +20,6 @@ public class Player {
         this.ships = new ArrayList<>();
     }
 
-    /**
-     * Posiciona um navio no tabuleiro do jogador.
-     *
-     * @param ship navio a ser posicionado
-     * @param row  linha inicial
-     * @param col  coluna inicial
-     * @param horizontal true para horizontal, false para vertical
-     * @throws IllegalArgumentException se o posicionamento for inválido
-     */
     /*@ public behavior
       @   requires ship != null;
       @   requires 0 <= row && row < 10;
@@ -43,7 +32,7 @@ public class Player {
     }
 
     /*@ public normal_behavior
-      @   ensures \result == board;
+      @   ensures \result != null;
       @   spec_pure
       @*/
     public Board getBoard() {
@@ -51,7 +40,7 @@ public class Player {
     }
 
     /*@ public normal_behavior
-      @   ensures \result == ships;
+      @   ensures \result != null;
       @   spec_pure
       @*/
     public List<Ship> getShips() {

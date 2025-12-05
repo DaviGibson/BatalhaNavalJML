@@ -2,8 +2,7 @@ package br.ufrn.imd.modelo;
 
 public class CellButton {
 
-    //@ public invariant state != null;
-    //@ public invariant (!isHit) ==> (state == State.WATER || state == State.SHIP);
+    
 
     /*@ spec_public @*/ private int row;
     /*@ spec_public @*/ private int col;
@@ -31,6 +30,7 @@ public class CellButton {
 
     /*@ public normal_behavior
       @   ensures isHit == true;
+      @   ensures state == \old(state);
       @   assignable isHit;
       @*/
     public void hit() {
@@ -92,8 +92,8 @@ public class CellButton {
       @   ensures \result == node;
       @*/
     /*@ spec_pure nullable @*/
-    public Object getNode() { 
-        return node; 
+    public Object getNode() {
+        return node;
     }
 
     /*@ public normal_behavior

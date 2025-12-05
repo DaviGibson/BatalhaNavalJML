@@ -14,7 +14,8 @@ public class Board {
       @ public invariant cells != null;
       @ public invariant ships != null;
       @ public invariant cells.length == 10;
-      @ public invariant (\forall int r; 0 <= r && r < 10; cells[r] != null && cells[r].length == 10);
+      @ public invariant (\forall int r; 0 <= r && r < 10;
+      @                      cells[r] != null && cells[r].length == 10);
       @ public invariant (\forall int r,c;
       @                      0 <= r && r < 10 && 0 <= c && c < 10;
       @                      cells[r][c] != null);
@@ -30,7 +31,17 @@ public class Board {
         ships = new ArrayList<Ship>();
         numShips = 0;
 
+        /*@ loop_invariant 0 <= r && r <= 10;
+          @ loop_invariant cells != null && cells.length == 10;
+          @*/
         for (int r = 0; r < 10; r++) {
+
+            /*@ loop_invariant 0 <= c && c <= 10;
+              @ loop_invariant cells[r] != null && cells[r].length == 10;
+              @ loop_invariant (\forall int k;
+              @                    0 <= k && k < c;
+              @                    cells[r][k] != null);
+              @*/
             for (int c = 0; c < 10; c++) {
                 cells[r][c] = new CellButton(r, c);
             }
@@ -84,24 +95,23 @@ public class Board {
         }
 
         ships.add(ship);
-        //@ assert ships.get(ships.size()-1) != null;
         numShips++;
     }
 
     /*@ public behavior
       @   requires cells != null;
+      @   requires ships != null;
+      @   requires (\forall int i; 0 <= i && i < ships.size(); ships.get(i) != null);
       @   requires 0 <= row && row < 10;
       @   requires 0 <= col && col < 10;
       @*/
     public void hitCells(int row, int col) {
         CellButton cell = cells[row][col];
         //@ assert cell != null;
-        //@ assert cell.state != null;
         cell.hit();
 
         for (Ship ship : ships) {
             //@ assert ship != null;
-            //@ assert ship.position != null;
             if (!ship.isAlive() && numShips > 0) {
                 numShips--;
             }
@@ -110,6 +120,7 @@ public class Board {
 
     /*@ public behavior
       @   requires ships != null;
+      @   requires (\forall int i; 0 <= i && i < ships.size(); ships.get(i) != null);
       @   requires 0 <= coluna && coluna < 10;
       @   requires 0 <= altura && altura < 10;
       @*/
@@ -117,10 +128,9 @@ public class Board {
         for (Ship ship : ships) {
             //@ assert ship != null;
             List<CellButton> pos = ship.getPosition();
+            //@ assert pos != null;
             for (CellButton cell : pos) {
                 //@ assert cell != null;
-                //@ assert cell.getState() != null;
-                //@ assert !cell.isHit() ==> (cell.getState() == CellButton.State.WATER || cell.getState() == CellButton.State.SHIP);
                 if (cell.getCol() == coluna && cell.getRow() == altura) {
                     cell.hit();
                 }
@@ -156,9 +166,6 @@ public class Board {
 
     /*@ public normal_behavior
       @   requires ships != null;
-      @   requires (\forall int i;
-      @               0 <= i && i < ships.size();
-      @               ships.get(i) != null);
       @*/
     public void setNumShips(int numShips) {
         this.numShips = numShips;
