@@ -20,6 +20,9 @@ public class Main extends Application {
      * @throws IOException se ocorrer um erro ao carregar o arquivo FXML.
      * @throws IllegalStateException se o arquivo FXML não for encontrado.
      */
+	/*@ public normal_behavior
+	  @   assignable \nothing;
+	  @*/
     @Override
     public void start(Stage stage) throws IOException {
         // Use o caminho correto para o arquivo FXML que está no mesmo pacote

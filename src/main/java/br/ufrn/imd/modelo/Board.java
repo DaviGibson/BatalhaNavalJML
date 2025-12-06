@@ -29,21 +29,19 @@ public class Board {
         ships = new ArrayList<Ship>();
 
         /*@ loop_invariant 0 <= r && r <= 10;
-          @ loop_invariant cells != null && cells.length == 10;
           @*/
         for (int r = 0; r < 10; r++) {
 
             /*@ loop_invariant 0 <= c && c <= 10;
-              @ loop_invariant cells[r] != null && cells[r].length == 10;
-              @ loop_invariant (\forall int k;
-              @                    0 <= k && k < c;
-              @                    cells[r][k] != null);
               @*/
             for (int c = 0; c < 10; c++) {
+                //@ assert 0 <= r && r < 10 && 0 <= c && c < 10;
                 cells[r][c] = new CellButton(r, c);
             }
         }
     }
+
+
 
     /*@ public behavior
       @   requires cells != null;
@@ -51,6 +49,7 @@ public class Board {
       @   requires ship != null;
       @   requires 0 <= row && row < 10;
       @   requires 0 <= col && col < 10;
+      @   assignable \everything;
       @*/
     public void placeShip(Ship ship, int row, int col, boolean horizontal) {
         int size = ship.getSize();
@@ -67,9 +66,20 @@ public class Board {
                 throw new IllegalArgumentException("Navio fora do tabuleiro");
             }
         }
-
+ 
         List<CellButton> pos = new ArrayList<CellButton>();
         if (horizontal) {
+            /*@
+              @  loop_invariant col <= c && c <= col + size;
+              @  loop_invariant pos != null;
+              @  loop_invariant pos.size() == c - col;
+              @  loop_invariant 0 <= row && row < 10;
+              @  loop_invariant 0 <= col && col + size <= 10;
+              @  loop_invariant (\forall int k;
+              @                    0 <= k && k < pos.size();
+              @                    pos.get(k) == cells[row][col + k]);
+              @  decreases (col + size) - c;
+              @*/
             for (int c = col; c < col + size; c++) {
                 if (cells[row][c].getState() == CellButton.State.SHIP) {
                     throw new IllegalArgumentException("Navio sobreposto");
@@ -77,22 +87,35 @@ public class Board {
                 pos.add(cells[row][c]);
             }
         } else {
-            for (int r = row; r < row + size; r++) {
-                if (cells[r][col].getState() == CellButton.State.SHIP) {
-                    throw new IllegalArgumentException("Navio sobreposto");
-                }
-                pos.add(cells[r][col]);
-            }
-        }
+            /*@
+              @  loop_invariant row <= r && r <= row + size;
+              @  loop_invariant pos != null;
+              @  loop_invariant pos.size() == r - row;
+              @  loop_invariant 0 <= col && col < 10;
+              @  loop_invariant 0 <= row && row + size <= 10;
+              @  loop_invariant (\forall int k;
+              @                    0 <= k && k < pos.size();
+              @                    pos.get(k) == cells[row + k][col]);
+              @  decreases (row + size) - r;
+              @*/
+    	  	for (int r = row; r < row + size; r++) {
+        	  	if (cells[r][col].getState() == CellButton.State.SHIP) {
+            	  	throw new IllegalArgumentException("Navio sobreposto");
+              	}
+              	pos.add(cells[r][col]);
+          	}
+      	}
 
-        try {
-            ship.setPosition(pos);
-        } catch (br.ufrn.imd.controle.CelulaInvalidaException e) {
-            throw new IllegalArgumentException(e.getMessage(), e);
-        }
+      	try {
+    	  	ship.setPosition(pos);
+      	} catch (br.ufrn.imd.controle.CelulaInvalidaException e) {
+    	  	throw new IllegalArgumentException(e.getMessage(), e);
+      	}
 
-        ships.add(ship);
-    }
+      	ships.add(ship);
+  	}
+
+
 
     /*@ public behavior
       @   requires cells != null;

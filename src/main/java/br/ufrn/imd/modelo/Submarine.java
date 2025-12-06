@@ -27,8 +27,8 @@ public class Submarine extends Ship {
 
     /*@ also
       @ public normal_behavior
-      @    requires row >= 0;
-      @    requires col >= 0;
+      @    requires row >= 0 && row < 10;
+      @    requires col >= 0 && col < 10;
       @    ensures \result != null;
       @    ensures \result.size() >= 1 && \result.size() <= 2;
       @    assignable \nothing;

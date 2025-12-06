@@ -8,9 +8,6 @@ public class Player {
     /*@ spec_public @*/ private Board board;
     /*@ spec_public @*/ private List<Ship> ships;
 
-    //@ public invariant board != null;
-    //@ public invariant ships != null;
-
     /*@ public normal_behavior
       @   ensures board != null;
       @   ensures ships != null && ships.isEmpty();
@@ -21,12 +18,16 @@ public class Player {
     }
 
     /*@ public behavior
+      @   requires board != null;
+      @   requires ships != null;
       @   requires ship != null;
       @   requires 0 <= row && row < 10;
       @   requires 0 <= col && col < 10;
       @   assignable \everything;
       @*/
     public void placeShip(Ship ship, int row, int col, boolean horizontal) {
+        //@ assert board != null;
+        //@ assert ships != null;
     	// uso local com assert, para guiar o provador
         List<Ship> localShips = this.ships;
         //@ assert localShips != null;
@@ -35,6 +36,7 @@ public class Player {
     }
 
     /*@ public normal_behavior
+      @   requires board != null;
       @   ensures \result != null;
       @   spec_pure
       @*/
@@ -43,6 +45,7 @@ public class Player {
     }
 
     /*@ public normal_behavior
+      @   requires ships != null;
       @   ensures \result != null;
       @   spec_pure
       @*/

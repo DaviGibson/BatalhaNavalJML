@@ -29,6 +29,8 @@ public class Destroyer extends Ship {
       @ public normal_behavior
       @    requires row >= 0;
       @    requires col >= 0;
+      @    requires col  < Integer.MAX_VALUE;
+      @    requires col  > Integer.MIN_VALUE;
       @    ensures \result != null;
       @    ensures \result.size() >= 1 && \result.size() <= 3;
       @    assignable \nothing;

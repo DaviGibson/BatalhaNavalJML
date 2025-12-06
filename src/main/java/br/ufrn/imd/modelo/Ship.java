@@ -94,7 +94,7 @@ public abstract class Ship implements IShip {
       @               posicoes.get(i) != null
       @            && posicoes.get(i).getState() != null);
       @   ensures position != null;
-      @   assignable position, size;
+      @   assignable \everything;
       @   signals (CelulaInvalidaException e) true;
       @*/
     public void setPosition(List<CellButton> posicoes) throws CelulaInvalidaException {

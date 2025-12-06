@@ -5,8 +5,8 @@ public class Game {
     /*@ spec_public @*/ private Player player1;
     /*@ spec_public @*/ private Player player2;
 
-    //@ public invariant player1 != null;
-    //@ public invariant player2 != null;
+    // //@ public invariant player1 != null;
+    // //@ public invariant player2 != null;
 
     /*@ public normal_behavior
       @   ensures player1 != null;

@@ -29,6 +29,8 @@ public class Frigate extends Ship {
       @ public normal_behavior
       @    requires row >= 0;
       @    requires col >= 0;
+      @    requires row < Integer.MAX_VALUE;
+      @    requires row > Integer.MIN_VALUE;
       @    ensures \result != null;
       @    ensures \result.size() >= 1 && \result.size() <= 3;
       @    assignable \nothing;
