@@ -29,17 +29,25 @@ public class Board {
         ships = new ArrayList<Ship>();
 
         /*@ loop_invariant 0 <= r && r <= 10;
+          @ loop_invariant cells != null && cells.length == 10;
           @*/
         for (int r = 0; r < 10; r++) {
 
             /*@ loop_invariant 0 <= c && c <= 10;
+              @ loop_invariant cells[r] != null && cells[r].length == 10;
+              @ loop_invariant (\forall int k;
+              @                    0 <= k && k < c;
+              @                    cells[r][k] != null);
               @*/
             for (int c = 0; c < 10; c++) {
-                //@ assert 0 <= r && r < 10 && 0 <= c && c < 10;
+                //@ assert 0 <= r && r < cells.length;
+                //@ assert 0 <= c && c < cells[r].length;
                 cells[r][c] = new CellButton(r, c);
             }
         }
     }
+
+
 
 
 
