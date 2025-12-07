@@ -47,10 +47,6 @@ public class Board {
         }
     }
 
-
-
-
-
     /*@ public behavior
       @   requires cells != null;
       @   requires ships != null;
@@ -74,7 +70,7 @@ public class Board {
                 throw new IllegalArgumentException("Navio fora do tabuleiro");
             }
         }
- 
+
         List<CellButton> pos = new ArrayList<CellButton>();
         if (horizontal) {
             /*@
@@ -106,29 +102,33 @@ public class Board {
               @                    pos.get(k) == cells[row + k][col]);
               @  decreases (row + size) - r;
               @*/
-    	  	for (int r = row; r < row + size; r++) {
-        	  	if (cells[r][col].getState() == CellButton.State.SHIP) {
-            	  	throw new IllegalArgumentException("Navio sobreposto");
-              	}
-              	pos.add(cells[r][col]);
-          	}
-      	}
+            for (int r = row; r < row + size; r++) {
+                if (cells[r][col].getState() == CellButton.State.SHIP) {
+                    throw new IllegalArgumentException("Navio sobreposto");
+                }
+                pos.add(cells[r][col]);
+            }
+        }
 
-      	try {
-    	  	ship.setPosition(pos);
-      	} catch (br.ufrn.imd.controle.CelulaInvalidaException e) {
-    	  	throw new IllegalArgumentException(e.getMessage(), e);
-      	}
+        try {
+            ship.setPosition(pos);
+        } catch (br.ufrn.imd.controle.CelulaInvalidaException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
 
-      	ships.add(ship);
-  	}
-
-
+        ships.add(ship);
+    }
 
     /*@ public behavior
       @   requires cells != null;
       @   requires ships != null;
-      @   requires (\forall int i; 0 <= i && i < ships.size(); ships.get(i) != null);
+      @   requires (\forall int i;
+      @               0 <= i && i < ships.size();
+      @               ships.get(i) != null);
+      @   // cada navio em ships tem position != null, para chamadas a isAlive()
+      @   requires (\forall int i;
+      @               0 <= i && i < ships.size();
+      @               ((Ship)ships.get(i)).getPosition() != null);
       @   requires 0 <= row && row < 10;
       @   requires 0 <= col && col < 10;
       @*/
@@ -139,18 +139,27 @@ public class Board {
 
         for (Ship ship : ships) {
             //@ assert ship != null;
+            //@ assert ship.position != null;
             if (!ship.isAlive()) {
-                // Agora não mexe mais em contador; remoção é feita em attListaNavios/atiraCelulasMiradas
+                // remoção é feita em attListaNavios/atiraCelulasMiradas
             }
         }
     }
 
     /*@ public behavior
       @   requires ships != null;
+      @   requires (\forall int i;
+      @               0 <= i && i < ships.size();
+      @               ships.get(i) != null);
+      @   // garante position != null para chamadas a getPosition()
+      @   requires (\forall int i;
+      @               0 <= i && i < ships.size();
+      @               ((Ship)ships.get(i)).getPosition() != null);
       @*/
     public void buscarCellNavio(int coluna, int altura) {
         for (Ship ship : ships) {
             //@ assert ship != null;
+            //@ assert ship.position != null;
             List<CellButton> pos = ship.getPosition();
             //@ assert pos != null;
             for (CellButton cell : pos) {
