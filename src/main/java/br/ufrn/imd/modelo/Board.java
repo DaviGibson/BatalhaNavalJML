@@ -125,7 +125,6 @@ public class Board {
       @   requires (\forall int i;
       @               0 <= i && i < ships.size();
       @               ships.get(i) != null);
-      @   // cada navio em ships tem position != null, para chamadas a isAlive()
       @   requires (\forall int i;
       @               0 <= i && i < ships.size();
       @               ((Ship)ships.get(i)).getPosition() != null);
@@ -151,7 +150,6 @@ public class Board {
       @   requires (\forall int i;
       @               0 <= i && i < ships.size();
       @               ships.get(i) != null);
-      @   // garante position != null para chamadas a getPosition()
       @   requires (\forall int i;
       @               0 <= i && i < ships.size();
       @               ((Ship)ships.get(i)).getPosition() != null);

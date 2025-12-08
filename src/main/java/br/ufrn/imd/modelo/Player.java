@@ -28,7 +28,6 @@ public class Player {
     public void placeShip(Ship ship, int row, int col, boolean horizontal) {
         //@ assert board != null;
         //@ assert ships != null;
-    	// uso local com assert, para guiar o provador
         List<Ship> localShips = this.ships;
         //@ assert localShips != null;
         board.placeShip(ship, row, col, horizontal);
