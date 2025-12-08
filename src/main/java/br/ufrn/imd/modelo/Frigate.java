@@ -43,6 +43,7 @@ public class Frigate extends Ship {
         list.add(new CellButton(row, col));
 
         // célula abaixo, se fizer sentido dentro do tabuleiro lógico
+        //@ assert row < Integer.MAX_VALUE;
         if (row + 1 < 10) {
             list.add(new CellButton(row + 1, col));
         }
